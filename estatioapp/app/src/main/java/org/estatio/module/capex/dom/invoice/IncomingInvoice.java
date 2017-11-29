@@ -1045,12 +1045,7 @@ public class IncomingInvoice extends Invoice<IncomingInvoice> implements SellerB
         return this;
     }
     public List<Supplier> autoComplete0EditSeller(final String search){
-        return partyRepository.autoComplete(search)
-            .stream()
-            .filter(Organisation.class::isInstance)
-            .map(Organisation.class::cast)
-            .map(x->new Supplier(x))
-            .collect(Collectors.toList());
+        return partyRepository.autoCompleteSupplier(search);
     }
     public String validateEditSeller(final Supplier supplier, final boolean createRoleIfRequired){
         if(supplier != null && !createRoleIfRequired) {

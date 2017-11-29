@@ -76,6 +76,7 @@ import org.estatio.module.party.dom.Organisation;
 import org.estatio.module.party.dom.OrganisationRepository;
 import org.estatio.module.party.dom.Party;
 import org.estatio.module.party.dom.PartyRepository;
+import org.estatio.module.party.dom.Supplier;
 import org.estatio.module.party.dom.role.PartyRoleRepository;
 import org.estatio.module.tax.dom.Tax;
 
@@ -340,25 +341,29 @@ public class Order extends UdoDomainObject2<Order> implements Stateful {
     @ActionLayout(named = "Edit Supplier")
     public Order editSeller(
             @Nullable
-            final Party supplier,
+            final Supplier supplier,
             final boolean createRoleIfRequired){
-        setSeller(supplier);
+        setSeller(supplier.getOrganisation());
         if(supplier != null && createRoleIfRequired) {
-            partyRoleRepository.findOrCreate(supplier, IncomingInvoiceRoleTypeEnum.SUPPLIER);
+            partyRoleRepository.findOrCreate(supplier.getOrganisation(), IncomingInvoiceRoleTypeEnum.SUPPLIER);
         }
         return this;
     }
 
-    public String validateEditSeller(final Party party, final boolean createRoleIfRequired){
-        if(party != null && !createRoleIfRequired) {
+    public String validateEditSeller(final Supplier supplier, final boolean createRoleIfRequired){
+        if(supplier != null && !createRoleIfRequired) {
             // requires that the supplier already has this role
-            return partyRoleRepository.validateThat(party, IncomingInvoiceRoleTypeEnum.SUPPLIER);
+            return partyRoleRepository.validateThat(supplier.getOrganisation(), IncomingInvoiceRoleTypeEnum.SUPPLIER);
         }
         return null;
     }
 
-    public Party default0EditSeller(){
-        return getSeller();
+    public List<Supplier> autoComplete0EditSeller(final String search){
+        return partyRepository.autoCompleteSupplier(search);
+    }
+
+    public Supplier default0EditSeller(){
+        return new Supplier((Organisation) getSeller());
     }
 
     public String disableEditSeller(){
