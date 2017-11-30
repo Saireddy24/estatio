@@ -19,6 +19,7 @@ public class ChamberOfCommerceCodeLookUpServiceTest {
             List<OrganisationNameNumberViewModel> findCandidatesForFrance(final String name){
                 return Arrays.asList(
                         new OrganisationNameNumberViewModel(),
+                        new OrganisationNameNumberViewModel(),
                         new OrganisationNameNumberViewModel()
                 );
             }
@@ -35,7 +36,7 @@ public class ChamberOfCommerceCodeLookUpServiceTest {
         List<OrganisationNameNumberViewModel> result = service.getChamberOfCommerceCodeCandidates(organisation);
 
         // then
-        Assertions.assertThat(result.size()).isEqualTo(2);
+        Assertions.assertThat(result.size()).isEqualTo(3);
 
     }
 
