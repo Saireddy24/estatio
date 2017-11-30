@@ -15,15 +15,15 @@ import org.estatio.module.party.dom.Organisation;
         nature = NatureOfService.DOMAIN)
 public class ChamberOfCommerceCodeLookUpService {
 
-    public List<OrganisationNameNumberViewModel> getChamberOfCommerceCodeCandidates(final Organisation organisation) {
-        return getChamberOfCommerceCodeCandidates(organisation.getName(), organisation.getAtPath());
+    public List<OrganisationNameNumberViewModel> getChamberOfCommerceCodeCandidatesByOrganisation(final Organisation organisation) {
+        return getChamberOfCommerceCodeCandidatesByOrganisation(organisation.getName(), organisation.getAtPath());
     }
 
-    public List<OrganisationNameNumberViewModel> getChamberOfCommerceCodeCandidates(final String name, final String atPath) {
+    public List<OrganisationNameNumberViewModel> getChamberOfCommerceCodeCandidatesByOrganisation(final String name, final String atPath) {
 
         switch (atPath){
         case "/FRA":
-//            return findCandidatesForFrance(name);
+//            return findCandidatesForFranceByName(name);
             return findCandidatesForFranceFake(name); // TODO: remove after developement
 
         default:
@@ -31,6 +31,22 @@ public class ChamberOfCommerceCodeLookUpService {
         }
 
     }
+
+    public OrganisationNameNumberViewModel getChamberOfCommerceCodeCandidatesByCode(final Organisation organisation) {
+        return getChamberOfCommerceCodeCandidatesByCode(organisation.getChamberOfCommerceCode(), organisation.getAtPath());
+    }
+
+    public OrganisationNameNumberViewModel getChamberOfCommerceCodeCandidatesByCode(final String code, final String atPath) {
+        switch (atPath){
+        case "/FRA":
+//              return findCandidateForFranceByCode(code);
+            return findCandidatesForFranceFake(code).get(0); // TODO: remove after developement
+
+        default:
+            return null;
+        }
+    }
+
 
     List<OrganisationNameNumberViewModel> findCandidatesForFranceFake(final String name){
         List<OrganisationNameNumberViewModel> result = new ArrayList<>();
@@ -40,7 +56,7 @@ public class ChamberOfCommerceCodeLookUpService {
         return result;
     }
 
-    List<OrganisationNameNumberViewModel> findCandidatesForFrance(final String name){
+    List<OrganisationNameNumberViewModel> findCandidatesForFranceByName(final String name){
         // TODO: improve SIREN to return name of company (l1_normalisee) alongside chamberOfCommerceCode to reduce number of api calls
         List<OrganisationNameNumberViewModel> result = new ArrayList<>();
         Siren siren = new Siren();
@@ -50,6 +66,13 @@ public class ChamberOfCommerceCodeLookUpService {
             result.add(new OrganisationNameNumberViewModel(companyName, code));
         }
         return result;
+    }
+
+    OrganisationNameNumberViewModel findCandidateForFranceByCode(final String code){
+        List<OrganisationNameNumberViewModel> result = new ArrayList<>();
+        Siren siren = new Siren();
+        String resultForCode = siren.getCompanyName(code);
+        return new OrganisationNameNumberViewModel(resultForCode, code);
     }
 
 }

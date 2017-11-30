@@ -180,8 +180,20 @@ public abstract class IncomingDocViewModel<T> implements HintStore.HintIdProvide
     // use of modify so can be overridden on IncomingInvoiceViewmodel
 
     @ActionLayout(named = "Edit Supplier")
-    public IncomingDocViewModel editSeller(final Supplier supplier, final boolean createRoleIfRequired) {
-        setSeller(supplier.getOrganisation());
+    public IncomingDocViewModel editSeller(
+            final Supplier supplier,
+            @Nullable
+            final OrganisationNameNumberViewModel checkSupplier,
+            final boolean createRoleIfRequired) {
+        Organisation organisation = supplier.getOrganisation();
+        if (checkSupplier!=null && checkSupplier.getChamberOfCommerceCode()!=null){
+            //TODO: factor out setChamberOfCommerceCodeIfNotAlready();
+            if (organisation.getChamberOfCommerceCode()!=null)  organisation.setChamberOfCommerceCode(checkSupplier.getChamberOfCommerceCode());
+        }
+        if (checkSupplier!=null && checkSupplier.getOrganisationName()!=null && !checkSupplier.getOrganisationName().equals(organisation.getName())){
+            organisation.setName(checkSupplier.getOrganisationName());
+        }
+        setSeller(organisation);
         if(createRoleIfRequired) {
             partyRoleRepository.findOrCreate(supplier.getOrganisation(), IncomingInvoiceRoleTypeEnum.SUPPLIER);
         }
@@ -193,10 +205,19 @@ public abstract class IncomingDocViewModel<T> implements HintStore.HintIdProvide
         return partyRepository.autoCompleteSupplier(search);
     }
 
+    public List<OrganisationNameNumberViewModel> choices1EditSeller(final Supplier supplier){
+        if (supplier==null) return null;
+        if (supplier.getOrganisation().getChamberOfCommerceCode()==null) {
+            return chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByOrganisation(supplier.getOrganisation());
+        } else {
+            return Arrays.asList(chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByCode(supplier.getOrganisation()));
+        }
+    }
+
     protected void onEditSeller(final Party seller){
     }
 
-    public String validateEditSeller(final Supplier supplier, final boolean createRoleIfRequired){
+    public String validateEditSeller(final Supplier supplier, final OrganisationNameNumberViewModel candidate, final boolean createRoleIfRequired){
         if(!createRoleIfRequired) {
             // requires that the supplier already has this role
             return partyRoleRepository.validateThat(supplier.getOrganisation(), IncomingInvoiceRoleTypeEnum.SUPPLIER);
@@ -226,12 +247,13 @@ public abstract class IncomingDocViewModel<T> implements HintStore.HintIdProvide
 
     public List<OrganisationNameNumberViewModel> autoComplete0CreateSeller(@MinLength(3) final String search){
         // TODO: take atPath from country - but how?
+        String atPath = "/FRA";
         try {
             TimeUnit.SECONDS.sleep(1);
         } catch (InterruptedException e) {
             // nothing
         }
-        List<OrganisationNameNumberViewModel> result =  chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidates(search, "/FRA");
+        List<OrganisationNameNumberViewModel> result =  chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByOrganisation(search, atPath);
         result.add(new OrganisationNameNumberViewModel(search, null));
         return result;
     }
