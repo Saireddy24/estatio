@@ -124,7 +124,7 @@ import lombok.Setter;
 )
 @XmlAccessorType(XmlAccessType.FIELD)
 @Getter @Setter
-public class IncomingDocAsInvoiceViewModel
+public class       IncomingDocAsInvoiceViewModel
         extends IncomingDocViewModel<IncomingInvoice>
         implements SellerBankAccountCreator {
 
