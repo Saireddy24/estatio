@@ -1,24 +1,25 @@
 package org.estatio.module.asset.fixtures.person.enums;
 
-import org.apache.isis.applib.services.registry.ServiceRegistry2;
+import java.util.Arrays;
+import java.util.stream.Collectors;
 
-import org.isisaddons.module.base.platform.fixturesupport.EnumWithFixtureScript;
-import org.isisaddons.module.base.platform.fixturesupport.EnumWithUpsert;
-import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
+import org.apache.isis.applib.fixturescripts.PersonaWithBuilderScript;
+import org.apache.isis.applib.fixturescripts.PersonaWithFinder;
+import org.apache.isis.applib.services.registry.ServiceRegistry2;
 
 import org.estatio.module.asset.dom.role.FixedAssetRoleTypeEnum;
 import org.estatio.module.asset.fixtures.person.builders.PersonAndRolesBuilder;
+import org.estatio.module.asset.fixtures.person.builders.PersonFixedAssetRolesBuilder;
 import org.estatio.module.asset.fixtures.property.enums.Property_enum;
 import org.estatio.module.base.fixtures.security.apptenancy.enums.ApplicationTenancy_enum;
 import org.estatio.module.party.dom.Party;
 import org.estatio.module.party.dom.PartyRepository;
 import org.estatio.module.party.dom.Person;
 import org.estatio.module.party.dom.PersonGenderType;
-import org.estatio.module.party.dom.PersonRepository;
 import org.estatio.module.party.dom.relationship.PartyRelationshipTypeEnum;
 import org.estatio.module.party.dom.role.IPartyRoleType;
 import org.estatio.module.party.dom.role.PartyRoleTypeEnum;
-import org.estatio.module.party.fixtures.organisation.enums.Organisation_enum;
+import org.estatio.module.party.fixtures.organisation.enums.OrganisationAndComms_enum;
 
 import lombok.Data;
 import lombok.Getter;
@@ -31,16 +32,15 @@ import static org.estatio.module.base.fixtures.security.apptenancy.enums.Applica
 import static org.estatio.module.party.dom.PersonGenderType.FEMALE;
 import static org.estatio.module.party.dom.PersonGenderType.MALE;
 import static org.estatio.module.party.dom.relationship.PartyRelationshipTypeEnum.CONTACT;
-import static org.estatio.module.party.fixtures.organisation.enums.Organisation_enum.PastaPapaItNl;
-import static org.estatio.module.party.fixtures.organisation.enums.Organisation_enum.PerdantFr;
-import static org.estatio.module.party.fixtures.organisation.enums.Organisation_enum.TopModelGb;
-import static org.estatio.module.party.fixtures.organisation.enums.Organisation_enum.YoukeaSe;
+import static org.estatio.module.party.fixtures.organisation.enums.OrganisationAndComms_enum.PastaPapaItNl;
+import static org.estatio.module.party.fixtures.organisation.enums.OrganisationAndComms_enum.PerdantFr;
+import static org.estatio.module.party.fixtures.organisation.enums.OrganisationAndComms_enum.TopModelGb;
+import static org.estatio.module.party.fixtures.organisation.enums.OrganisationAndComms_enum.YoukeaSe;
 
 @Getter
 @Accessors(chain = true)
 public enum Person_enum
-        implements EnumWithUpsert<Person>,
-                   EnumWithFixtureScript<Person, PersonAndRolesBuilder> {
+        implements PersonaWithBuilderScript<Person, PersonAndRolesBuilder>, PersonaWithFinder<Person> {
 
     AgnethaFaltskogSe("AFALTSKOG", "Agnetha", "Faltskog", "A", false, FEMALE, Se,
             CONTACT, YoukeaSe,
@@ -155,7 +155,7 @@ public enum Person_enum
     @Data
     public static class FixedAssetRoleSpec {
         private final FixedAssetRoleTypeEnum fixedAssetRole;
-        private final Property_enum property;
+        private final Property_enum property_d;
     }
 
     private final String ref;
@@ -164,10 +164,10 @@ public enum Person_enum
     private final String initials;
     private final String securityUserName;
     private final PersonGenderType personGenderType;
-    private final ApplicationTenancy_enum applicationTenancy;
+    private final ApplicationTenancy_enum applicationTenancy_d;
 
     private final PartyRelationshipTypeEnum partyRelationshipType;
-    private final Organisation_enum partyFrom;
+    private final OrganisationAndComms_enum partyFrom_d;
 
     private final IPartyRoleType[] partyRoleTypes;
     private final FixedAssetRoleSpec[] fixedAssetRoles;
@@ -179,9 +179,9 @@ public enum Person_enum
             final String initials,
             final boolean setupSecurityUser,
             final PersonGenderType personGenderType,
-            final ApplicationTenancy_enum applicationTenancy,
+            final ApplicationTenancy_enum applicationTenancy_d,
             final PartyRelationshipTypeEnum partyRelationshipType,
-            final Organisation_enum partyFrom,
+            final OrganisationAndComms_enum partyFrom_d,
             final IPartyRoleType[] partyRoleTypes,
             final FixedAssetRoleSpec[] fixedAssetRoles) {
         this.ref = ref;
@@ -190,25 +190,13 @@ public enum Person_enum
         this.initials = initials;
         this.securityUserName = setupSecurityUser ? ref.toLowerCase() : null;
         this.personGenderType = personGenderType;
-        this.applicationTenancy = applicationTenancy;
+        this.applicationTenancy_d = applicationTenancy_d;
 
-        this.partyFrom = partyFrom;
+        this.partyFrom_d = partyFrom_d;
         this.partyRelationshipType = partyRelationshipType;
 
         this.partyRoleTypes = partyRoleTypes;
         this.fixedAssetRoles = fixedAssetRoles;
-    }
-
-    @Override
-    public Person upsertUsing(final ServiceRegistry2 serviceRegistry) {
-        final PersonRepository personRepository = serviceRegistry
-                .lookupService(PersonRepository.class);
-        Person person = findUsing(serviceRegistry);
-        if(person == null) {
-            final ApplicationTenancy applicationTenancy = getApplicationTenancy().findUsing(serviceRegistry);
-            person = personRepository.newPerson(ref, initials, firstName, lastName, personGenderType, applicationTenancy);
-        }
-        return person;
     }
 
     @Override
@@ -221,25 +209,31 @@ public enum Person_enum
 
 
     @Override
-    public PersonAndRolesBuilder toFixtureScript() {
-        final PersonAndRolesBuilder personAndRolesBuilder = new PersonAndRolesBuilder();
-        personAndRolesBuilder
+    public PersonAndRolesBuilder toBuilderScript() {
+
+        final PersonAndRolesBuilder personAndRolesBuilder = new PersonAndRolesBuilder()
                 .setReference(getRef())
                 .setFirstName(getFirstName())
                 .setLastName(getLastName())
                 .setInitials(getInitials())
                 .setSecurityUsername(getSecurityUserName())
                 .setPersonGenderType(getPersonGenderType())
-                .setAtPath(getApplicationTenancy().getPath())
+                .setAtPath(getApplicationTenancy_d().getPath())
                 .setRelationshipType(getPartyRelationshipType())
-                .setFromParty(getPartyFrom());
+                .setPrereq((f,ec) -> f.setFromParty(f.objectFor(getPartyFrom_d(), ec)))
+                .setPrereq((f,ec) -> f.setFixedAssetRoleSpecs(
+                            Arrays.stream(Person_enum.this.getFixedAssetRoles())
+                                .map(x -> new PersonFixedAssetRolesBuilder.FixedAssetRoleSpec(
+                                                x.fixedAssetRole,
+                                                f.objectFor(x.getProperty_d(), ec))
+                                        )
+                                .collect(Collectors.toList())))
+                ;
 
         for (final IPartyRoleType partyRoleType : getPartyRoleTypes()) {
             personAndRolesBuilder.addPartyRoleType(partyRoleType);
         }
-        for (final Person_enum.FixedAssetRoleSpec roleSpec : getFixedAssetRoles()) {
-            personAndRolesBuilder.addFixedAssetRole(roleSpec.getFixedAssetRole(), roleSpec.getProperty().getRef());
-        }
         return personAndRolesBuilder;
     }
+
 }

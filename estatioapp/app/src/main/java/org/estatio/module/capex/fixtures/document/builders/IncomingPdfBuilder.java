@@ -15,13 +15,17 @@ import org.incode.module.document.dom.impl.docs.Document;
 
 import org.estatio.module.capex.app.DocumentMenu;
 
+import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
+@EqualsAndHashCode(of={"contextClass", "resourceName"}, callSuper = false)
+@ToString(of={"contextClass", "resourceName"})
 @Accessors(chain = true)
-public class IncomingPdfBuilder
-        extends BuilderScriptAbstract<IncomingPdfBuilder> {
+public final class IncomingPdfBuilder
+        extends BuilderScriptAbstract<Document, IncomingPdfBuilder> {
 
     @Getter @Setter
     private Class<?> contextClass;
@@ -31,7 +35,7 @@ public class IncomingPdfBuilder
     private String runAs;
 
     @Getter
-    private Document document;
+    private Document object;
 
     @Override
     protected void execute(final ExecutionContext executionContext) {
@@ -53,7 +57,7 @@ public class IncomingPdfBuilder
         }
 
         final Blob blob = new Blob(resourceName, "application/pdf", bytes);
-        document = runAs != null
+        object = runAs != null
                         ? sudoService.sudo(runAs, () -> upload(blob))
                         : upload(blob);
 

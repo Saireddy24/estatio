@@ -15,10 +15,10 @@ import org.apache.isis.applib.services.wrapper.InvalidException;
 
 import org.estatio.module.asset.dom.Property;
 import org.estatio.module.asset.dom.PropertyRepository;
-import org.estatio.module.asset.fixtures.property.personas.PropertyAndUnitsAndOwnerAndManagerForOxfGb;
+import org.estatio.module.asset.fixtures.property.enums.Property_enum;
 import org.estatio.module.budget.dom.budget.Budget;
 import org.estatio.module.budget.dom.budget.BudgetRepository;
-import org.estatio.module.budget.fixtures.budgets.personas.BudgetsForOxf;
+import org.estatio.module.budget.fixtures.budgets.enums.Budget_enum;
 import org.estatio.module.budget.integtests.BudgetModuleIntegTestAbstract;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +38,9 @@ public class BudgetRepository_IntegTest extends BudgetModuleIntegTestAbstract {
         runFixtureScript(new FixtureScript() {
             @Override
             protected void execute(final ExecutionContext executionContext) {
-                executionContext.executeChild(this, new BudgetsForOxf());
+                executionContext.executeChild(this, Budget_enum.OxfBudget2015.toBuilderScript());
+                executionContext.executeChild(this, Budget_enum.OxfBudget2016.toBuilderScript());
+
             }
         });
     }
@@ -48,7 +50,7 @@ public class BudgetRepository_IntegTest extends BudgetModuleIntegTestAbstract {
         @Test
         public void happyCase() throws Exception {
             // given
-            Property property = propertyRepository.findPropertyByReference(PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
+            Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
             // when
             final List<Budget> budgetList = budgetRepository.findByProperty(property);
             // then
@@ -63,7 +65,7 @@ public class BudgetRepository_IntegTest extends BudgetModuleIntegTestAbstract {
         @Test
         public void happyCase() throws Exception {
             // given
-            Property property = propertyRepository.findPropertyByReference(PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
+            Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
             // when
             final Budget budget = budgetRepository.findByPropertyAndStartDate(property, new LocalDate(2015, 01, 01));
             // then
@@ -83,7 +85,7 @@ public class BudgetRepository_IntegTest extends BudgetModuleIntegTestAbstract {
         @Test
         public void happyCase() throws Exception {
             // given
-            Property property = propertyRepository.findPropertyByReference(PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
+            Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
 
             // when (case existing budget found)
             final Budget budget = budgetRepository.findOrCreateBudget(property, new LocalDate(2015, 01, 01), new LocalDate(2015, 12, 31));
@@ -109,7 +111,7 @@ public class BudgetRepository_IntegTest extends BudgetModuleIntegTestAbstract {
         @Test
         public void happyCase() throws Exception {
             // given
-            Property property = propertyRepository.findPropertyByReference(PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
+            Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
             // when
             final Budget budget = budgetRepository.findByPropertyAndDate(property, new LocalDate(2015, 01, 01));
             // then
@@ -143,8 +145,7 @@ public class BudgetRepository_IntegTest extends BudgetModuleIntegTestAbstract {
         public void budgetPeriodCannotExceedYear() throws Exception {
 
             // given
-            final Property property = propertyRepository.findPropertyByReference(
-                    PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
+            final Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
 
             //then
             expectedException.expect(InvalidException.class);
@@ -159,8 +160,7 @@ public class BudgetRepository_IntegTest extends BudgetModuleIntegTestAbstract {
         public void emptyStartDate() {
 
             // given
-            final Property property = propertyRepository.findPropertyByReference(
-                    PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
+            final Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
 
             //then
             expectedException.expect(InvalidException.class);
@@ -173,8 +173,7 @@ public class BudgetRepository_IntegTest extends BudgetModuleIntegTestAbstract {
         public void wrongBudgetDates() {
 
             // given
-            final Property property = propertyRepository.findPropertyByReference(
-                    PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
+            final Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
 
             //then
             expectedException.expect(InvalidException.class);
@@ -189,8 +188,7 @@ public class BudgetRepository_IntegTest extends BudgetModuleIntegTestAbstract {
         public void overlappingDates() {
 
             // given
-            final Property property = propertyRepository.findPropertyByReference(
-                    PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
+            final Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
             final Budget budget = budgetRepository.findByPropertyAndDate(property, new LocalDate(2015, 01, 01));
 
             //then

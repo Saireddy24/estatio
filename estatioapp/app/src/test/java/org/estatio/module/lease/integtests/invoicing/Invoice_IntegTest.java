@@ -36,10 +36,9 @@ import org.isisaddons.module.security.dom.tenancy.ApplicationTenancy;
 import org.incode.module.base.integtests.VT;
 
 import org.estatio.module.asset.dom.FixedAsset;
-import org.estatio.module.asset.fixtures.person.personas.PersonAndRolesForLinusTorvaldsNl;
-import org.estatio.module.asset.fixtures.property.personas.PropertyAndUnitsAndOwnerAndManagerForKalNl;
-import org.estatio.module.asset.fixtures.property.personas.PropertyAndUnitsAndOwnerAndManagerForOxfGb;
-import org.estatio.module.base.fixtures.security.apptenancy.personas.ApplicationTenancyForGb;
+import org.estatio.module.asset.fixtures.person.enums.Person_enum;
+import org.estatio.module.asset.fixtures.property.enums.PropertyAndUnitsAndOwnerAndManager_enum;
+import org.estatio.module.base.fixtures.security.apptenancy.enums.ApplicationTenancy_enum;
 import org.estatio.module.charge.dom.Charge;
 import org.estatio.module.charge.dom.ChargeRepository;
 import org.estatio.module.currency.dom.Currency;
@@ -54,20 +53,25 @@ import org.estatio.module.lease.dom.LeaseRepository;
 import org.estatio.module.lease.dom.invoicing.InvoiceForLease;
 import org.estatio.module.lease.dom.invoicing.InvoiceForLeaseRepository;
 import org.estatio.module.lease.dom.invoicing.InvoiceItemForLease;
+import org.estatio.module.lease.fixtures.breakoptions.personas.LeaseBreakOptionsForOxfMediax002Gb;
+import org.estatio.module.lease.fixtures.breakoptions.personas.LeaseBreakOptionsForOxfPoison003Gb;
+import org.estatio.module.lease.fixtures.breakoptions.personas.LeaseBreakOptionsForOxfTopModel001;
 import org.estatio.module.lease.fixtures.invoicing.personas.InvoiceForLeaseItemTypeOfRentOneQuarterForKalPoison001;
 import org.estatio.module.lease.fixtures.invoicing.personas.InvoiceForLeaseItemTypeOfRentOneQuarterForOxfPoison003;
-import org.estatio.module.lease.fixtures.lease.LeaseBreakOptionsForOxfMediax002Gb;
-import org.estatio.module.lease.fixtures.lease.LeaseBreakOptionsForOxfPoison003Gb;
-import org.estatio.module.lease.fixtures.lease.LeaseBreakOptionsForOxfTopModel001;
-import org.estatio.module.lease.fixtures.lease.LeaseForOxfPoison003Gb;
-import org.estatio.module.lease.fixtures.lease.LeaseForOxfPret004Gb;
-import org.estatio.module.lease.fixtures.lease.LeaseItemAndTermsForOxfMiracl005Gb;
-import org.estatio.module.lease.fixtures.lease.LeaseItemAndTermsForOxfPoison003Gb;
+import org.estatio.module.lease.fixtures.lease.enums.Lease_enum;
+import org.estatio.module.lease.fixtures.leaseitems.deposits.personas.LeaseItemAndLeaseTermForDepositForOxfMiracl005Gb;
+import org.estatio.module.lease.fixtures.leaseitems.discount.personas.LeaseItemAndLeaseTermForDiscountForOxfMiracl005Gb;
+import org.estatio.module.lease.fixtures.leaseitems.percentage.personas.LeaseItemAndLeaseTermForPercentageForOxfMiracl005Gb;
+import org.estatio.module.lease.fixtures.leaseitems.rent.personas.LeaseItemAndLeaseTermForRentOf2ForOxfMiracl005Gb;
+import org.estatio.module.lease.fixtures.leaseitems.rent.personas.LeaseItemAndLeaseTermForRentOf2ForOxfPoison003Gb;
+import org.estatio.module.lease.fixtures.leaseitems.servicecharge.personas.LeaseItemAndLeaseTermForServiceChargeForOxfPoison003Gb;
+import org.estatio.module.lease.fixtures.leaseitems.servicecharge.personas.LeaseItemAndLeaseTermForServiceChargeOf2ForOxfMiracl005Gb;
+import org.estatio.module.lease.fixtures.leaseitems.turnoverrent.personas.LeaseItemAndLeaseTermForTurnoverRentForOxfMiracl005Gb;
+import org.estatio.module.lease.fixtures.leaseitems.turnoverrent.personas.LeaseItemAndLeaseTermForTurnoverRentForOxfPoison003Gb;
 import org.estatio.module.lease.integtests.LeaseModuleIntegTestAbstract;
 import org.estatio.module.party.dom.Party;
 import org.estatio.module.party.dom.PartyRepository;
-import org.estatio.module.party.fixtures.organisation.personas.OrganisationForHelloWorldGb;
-import org.estatio.module.party.fixtures.organisation.personas.OrganisationForPoisonGb;
+import org.estatio.module.party.fixtures.organisation.enums.OrganisationAndComms_enum;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertThat;
@@ -102,7 +106,9 @@ public class Invoice_IntegTest extends LeaseModuleIntegTestAbstract {
             runFixtureScript(new FixtureScript() {
                 @Override
                 protected void execute(ExecutionContext executionContext) {
-                    executionContext.executeChild(this, new LeaseItemAndTermsForOxfPoison003Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForRentOf2ForOxfPoison003Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForServiceChargeForOxfPoison003Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForTurnoverRentForOxfPoison003Gb());
                 }
             });
         }
@@ -113,10 +119,10 @@ public class Invoice_IntegTest extends LeaseModuleIntegTestAbstract {
 
         @Before
         public void setUp() throws Exception {
-            applicationTenancy = applicationTenancies.findTenancyByPath(ApplicationTenancyForGb.PATH);
-            seller = partyRepository.findPartyByReference(OrganisationForHelloWorldGb.REF);
-            buyer = partyRepository.findPartyByReference(OrganisationForPoisonGb.REF);
-            lease = leaseRepository.findLeaseByReference(LeaseForOxfPoison003Gb.REF);
+            applicationTenancy = applicationTenancies.findTenancyByPath(ApplicationTenancy_enum.Gb.getPath());
+            seller = OrganisationAndComms_enum.HelloWorldGb.findUsing(serviceRegistry);
+            buyer = OrganisationAndComms_enum.PoisonGb.findUsing(serviceRegistry);
+            lease = Lease_enum.OxfPoison003Gb.findUsing(serviceRegistry);
 
             charge = chargeRepository.listAll().get(0);
             currency = currencyRepository.allCurrencies().get(0);
@@ -153,10 +159,10 @@ public class Invoice_IntegTest extends LeaseModuleIntegTestAbstract {
             runFixtureScript(new FixtureScript() {
                 @Override
                 protected void execute(ExecutionContext executionContext) {
-                    executionContext.executeChild(this, new PersonAndRolesForLinusTorvaldsNl());
+                    executionContext.executeChild(this, Person_enum.LinusTorvaldsNl.toBuilderScript());
 
-                    executionContext.executeChild(this, new PropertyAndUnitsAndOwnerAndManagerForOxfGb());
-                    executionContext.executeChild(this, new PropertyAndUnitsAndOwnerAndManagerForKalNl());
+                    executionContext.executeChild(this, PropertyAndUnitsAndOwnerAndManager_enum.OxfGb.toBuilderScript());
+                    executionContext.executeChild(this, PropertyAndUnitsAndOwnerAndManager_enum.KalNl.toBuilderScript());
 
                     executionContext.executeChild(this, new LeaseBreakOptionsForOxfTopModel001());
 
@@ -166,9 +172,15 @@ public class Invoice_IntegTest extends LeaseModuleIntegTestAbstract {
                     executionContext.executeChild(this, new InvoiceForLeaseItemTypeOfRentOneQuarterForOxfPoison003());
                     executionContext.executeChild(this, new InvoiceForLeaseItemTypeOfRentOneQuarterForKalPoison001());
 
-                    executionContext.executeChild(this, new LeaseForOxfPret004Gb());
+                    executionContext.executeChild(this, Lease_enum.OxfPret004Gb.toBuilderScript());
 
-                    executionContext.executeChild(this, new LeaseItemAndTermsForOxfMiracl005Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForRentOf2ForOxfMiracl005Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForServiceChargeOf2ForOxfMiracl005Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForTurnoverRentForOxfMiracl005Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForDiscountForOxfMiracl005Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForPercentageForOxfMiracl005Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForDepositForOxfMiracl005Gb());
+
                 }
             });
         }

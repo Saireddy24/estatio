@@ -12,13 +12,13 @@ import org.apache.isis.applib.services.wrapper.InvalidException;
 
 import org.estatio.module.asset.dom.Property;
 import org.estatio.module.asset.dom.PropertyRepository;
-import org.estatio.module.asset.fixtures.property.personas.PropertyAndUnitsAndOwnerAndManagerForOxfGb;
+import org.estatio.module.asset.fixtures.property.enums.Property_enum;
 import org.estatio.module.budget.dom.budget.Budget;
 import org.estatio.module.budget.dom.budget.BudgetRepository;
 import org.estatio.module.budget.dom.budgetcalculation.BudgetCalculationType;
 import org.estatio.module.budget.dom.partioning.Partitioning;
 import org.estatio.module.budget.dom.partioning.PartitioningRepository;
-import org.estatio.module.budget.fixtures.budgets.personas.BudgetsForOxf;
+import org.estatio.module.budget.fixtures.budgets.enums.Budget_enum;
 import org.estatio.module.budget.integtests.BudgetModuleIntegTestAbstract;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -39,7 +39,9 @@ public class PartitioningRepository_IntegTest extends BudgetModuleIntegTestAbstr
         runFixtureScript(new FixtureScript() {
             @Override
             protected void execute(final ExecutionContext executionContext) {
-                executionContext.executeChild(this, new BudgetsForOxf());
+                executionContext.executeChild(this, Budget_enum.OxfBudget2015.toBuilderScript());
+                executionContext.executeChild(this, Budget_enum.OxfBudget2016.toBuilderScript());
+
             }
         });
     }
@@ -53,8 +55,9 @@ public class PartitioningRepository_IntegTest extends BudgetModuleIntegTestAbstr
         public void newPartitioningTest() throws Exception{
 
             // given
-            Property property = propertyRepository.findPropertyByReference(PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
+            Budget budget = budgetRepository.findByPropertyAndStartDate(property,
+                    Budget_enum.OxfBudget2015.getStartDate());
             assertThat(budget.getPartitionings().size()).isEqualTo(0);
 
             // when
@@ -75,8 +78,9 @@ public class PartitioningRepository_IntegTest extends BudgetModuleIntegTestAbstr
         public void validatePartitioningTest() throws Exception {
 
             // given
-            Property property = propertyRepository.findPropertyByReference(PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
+            Budget budget = budgetRepository.findByPropertyAndStartDate(property,
+                    Budget_enum.OxfBudget2015.getStartDate());
             wrap(partitioningRepository).newPartitioning(budget, budget.getStartDate().plusDays(1), budget.getStartDate().plusDays(2), BudgetCalculationType.BUDGETED);
             transactionService.flushTransaction();
             assertThat(budget.getPartitionings().size()).isEqualTo(1);
@@ -94,8 +98,9 @@ public class PartitioningRepository_IntegTest extends BudgetModuleIntegTestAbstr
         public void validatePartitioningTest2() throws Exception {
 
             // given
-            Property property = propertyRepository.findPropertyByReference(PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
-            Budget budget = budgetRepository.findByPropertyAndStartDate(property, BudgetsForOxf.BUDGET_2015_START_DATE);
+            Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
+            Budget budget = budgetRepository.findByPropertyAndStartDate(property,
+                    Budget_enum.OxfBudget2015.getStartDate());
             wrap(partitioningRepository).newPartitioning(budget, budget.getStartDate(), budget.getEndDate(), BudgetCalculationType.ACTUAL);
 
             // and expect

@@ -26,6 +26,7 @@ import javax.inject.Inject;
 import com.google.common.collect.Lists;
 
 import org.apache.isis.applib.fixturescripts.BuilderScriptAbstract;
+
 import org.estatio.module.party.dom.Person;
 import org.estatio.module.party.dom.role.IPartyRoleType;
 import org.estatio.module.party.dom.role.PartyRole;
@@ -34,18 +35,21 @@ import org.estatio.module.party.dom.role.PartyRoleTypeService;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
-@EqualsAndHashCode(of={"person"})
+@EqualsAndHashCode(of={"person", "partyRoleTypes"}, callSuper = false)
+@ToString(of={"person", "partyRoleTypes"})
 @Accessors(chain = true)
-public class PersonPartyRolesBuilder
-        extends BuilderScriptAbstract<PersonPartyRolesBuilder> {
+public final class PersonPartyRolesBuilder
+        extends BuilderScriptAbstract<List<PartyRole>,PersonPartyRolesBuilder> {
 
     @Getter @Setter
     private Person person;
 
     @Getter
     private List<IPartyRoleType> partyRoleTypes = Lists.newArrayList();
+
     public PersonPartyRolesBuilder addPartyRoleType(IPartyRoleType partyRoleType) {
         partyRoleTypes.add(partyRoleType);
         return this;
@@ -56,7 +60,7 @@ public class PersonPartyRolesBuilder
     }
 
     @Getter
-    private List<PartyRole> partyRoles = Lists.newArrayList();
+    private List<PartyRole> object = Lists.newArrayList();
 
     @Override
     public void execute(ExecutionContext executionContext) {
@@ -65,7 +69,7 @@ public class PersonPartyRolesBuilder
 
         for (IPartyRoleType partyRoleType : partyRoleTypes) {
             final PartyRole partyRole = partyRoleTypeService.createRole(person, partyRoleType);
-            partyRoles.add(partyRole);
+            object.add(partyRole);
         }
     }
 

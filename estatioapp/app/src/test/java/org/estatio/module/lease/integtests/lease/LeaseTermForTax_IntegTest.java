@@ -35,9 +35,9 @@ import org.estatio.module.lease.dom.LeaseItemRepository;
 import org.estatio.module.lease.dom.LeaseItemType;
 import org.estatio.module.lease.dom.LeaseRepository;
 import org.estatio.module.lease.dom.LeaseTermForTax;
-import org.estatio.module.lease.fixtures.lease.LeaseForOxfTopModel001Gb;
-import org.estatio.module.lease.fixtures.lease.LeaseItemAndLeaseTermForRentForOxfTopModel001Gb;
-import org.estatio.module.lease.fixtures.lease.LeaseItemAndLeaseTermForTaxForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.lease.enums.Lease_enum;
+import org.estatio.module.lease.fixtures.leaseitems.rent.personas.LeaseItemAndLeaseTermForRentForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.tax.personas.LeaseItemAndLeaseTermForTaxForOxfTopModel001Gb;
 import org.estatio.module.lease.integtests.LeaseModuleIntegTestAbstract;
 
 import static org.hamcrest.CoreMatchers.is;
@@ -74,7 +74,7 @@ public class LeaseTermForTax_IntegTest extends LeaseModuleIntegTestAbstract {
 
         @Before
         public void setup() {
-            lease = leaseRepository.findLeaseByReference(LeaseForOxfTopModel001Gb.REF);
+            lease = Lease_enum.OxfTopModel001Gb.findUsing(serviceRegistry);
             item = leaseItemRepository.findLeaseItemsByType(lease, LeaseItemType.RENT).get(0);
             taxItem = leaseItemRepository.findLeaseItemsByType(lease, LeaseItemType.TAX).get(0);
             assertNotNull(item);

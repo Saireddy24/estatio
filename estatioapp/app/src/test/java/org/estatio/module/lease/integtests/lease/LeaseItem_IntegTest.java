@@ -39,7 +39,7 @@ import org.incode.module.base.integtests.VT;
 
 import org.estatio.module.charge.dom.Charge;
 import org.estatio.module.charge.dom.ChargeRepository;
-import org.estatio.module.charge.fixtures.charges.refdata.ChargeRefData;
+import org.estatio.module.charge.fixtures.charges.enums.Charge_enum;
 import org.estatio.module.invoice.dom.PaymentMethod;
 import org.estatio.module.lease.app.LeaseMenu;
 import org.estatio.module.lease.dom.InvoicingFrequency;
@@ -53,10 +53,18 @@ import org.estatio.module.lease.dom.LeaseTermForIndexable;
 import org.estatio.module.lease.dom.LeaseTermForServiceCharge;
 import org.estatio.module.lease.dom.invoicing.InvoiceItemForLeaseRepository;
 import org.estatio.module.lease.fixtures.invoicing.personas.InvoiceForLeaseItemTypeOfRentOneQuarterForKalPoison001;
-import org.estatio.module.lease.fixtures.lease.LeaseForKalPoison001Nl;
-import org.estatio.module.lease.fixtures.lease.LeaseForOxfTopModel001Gb;
-import org.estatio.module.lease.fixtures.lease.LeaseItemAndLeaseTermForRentForKalPoison001;
-import org.estatio.module.lease.fixtures.lease.LeaseItemAndTermsForOxfTopModel001;
+import org.estatio.module.lease.fixtures.lease.enums.Lease_enum;
+import org.estatio.module.lease.fixtures.leaseitems.deposits.personas.LeaseItemAndLeaseTermForDepositForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.discount.personas.LeaseItemAndLeaseTermForDiscountForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.entryfee.personas.LeaseItemAndLeaseTermForEntryFeeForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.marketing.personas.LeaseItemAndLeaseTermForMarketingForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.percentage.personas.LeaseItemAndLeaseTermForPercentageForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.rent.personas.LeaseItemAndLeaseTermForRentForKalPoison001;
+import org.estatio.module.lease.fixtures.leaseitems.rent.personas.LeaseItemAndLeaseTermForRentForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.servicecharge.personas.LeaseItemAndLeaseTermForServiceChargeForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.svcchgbudgeted.personas.LeaseItemForServiceChargeBudgetedForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.tax.personas.LeaseItemAndLeaseTermForTaxForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.turnoverrent.personas.LeaseItemAndLeaseTermForTurnoverRentForOxfTopModel001Gb;
 import org.estatio.module.lease.integtests.LeaseModuleIntegTestAbstract;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -71,10 +79,21 @@ public class LeaseItem_IntegTest extends LeaseModuleIntegTestAbstract {
             @Override
             protected void execute(ExecutionContext executionContext) {
 
-                executionContext.executeChild(this, new LeaseForKalPoison001Nl());
+                executionContext.executeChild(this, Lease_enum.KalPoison001Nl.toBuilderScript());
                 executionContext.executeChild(this, new LeaseItemAndLeaseTermForRentForKalPoison001());
                 executionContext.executeChild(this, new InvoiceForLeaseItemTypeOfRentOneQuarterForKalPoison001());
-                executionContext.executeChild(this, new LeaseItemAndTermsForOxfTopModel001());
+
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForRentForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForServiceChargeForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemForServiceChargeBudgetedForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForTurnoverRentForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForPercentageForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForDiscountForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForEntryFeeForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForTaxForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForDepositForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForMarketingForOxfTopModel001Gb());
+
             }
         });
     }
@@ -89,7 +108,7 @@ public class LeaseItem_IntegTest extends LeaseModuleIntegTestAbstract {
 
     @Before
     public void setUp() throws Exception {
-        lease = leaseRepository.findLeaseByReference(LeaseForOxfTopModel001Gb.REF);
+        lease = Lease_enum.OxfTopModel001Gb.findUsing(serviceRegistry);
     }
 
     public static class FindTerm extends LeaseItem_IntegTest {
@@ -148,7 +167,7 @@ public class LeaseItem_IntegTest extends LeaseModuleIntegTestAbstract {
 
             // given
             LeaseItem leaseItem = lease.findItem(LeaseItemType.SERVICE_CHARGE, VT.ld(2010, 7, 15), LeaseAgreementRoleTypeEnum.LANDLORD);
-            final Charge charge = chargeRepository.findByReference(ChargeRefData.GB_SERVICE_CHARGE);
+            final Charge charge = Charge_enum.GbServiceCharge.findUsing(serviceRegistry);
             assertThat(leaseItem.getInvoicedBy()).isEqualTo(LeaseAgreementRoleTypeEnum.LANDLORD);
 
             // when
@@ -183,11 +202,11 @@ public class LeaseItem_IntegTest extends LeaseModuleIntegTestAbstract {
 
             // given
             LeaseItem leaseItem = lease.findItem(LeaseItemType.SERVICE_CHARGE, VT.ld(2010, 7, 15), VT.bi(1));
-            final Charge charge = chargeRepository.findByReference(ChargeRefData.GB_SERVICE_CHARGE);
+            final Charge charge = Charge_enum.GbServiceCharge.findUsing(serviceRegistry);
             assertThat(leaseItem.getCharge()).isEqualTo(charge);
 
             // when
-            final Charge newCharge = chargeRepository.findByReference(ChargeRefData.IT_SERVICE_CHARGE);
+            final Charge newCharge = Charge_enum.ItServiceCharge.findUsing(serviceRegistry);
             final LeaseItem leaseItemReturned = wrap(leaseItem).changeCharge(newCharge);
 
             // then
@@ -223,7 +242,7 @@ public class LeaseItem_IntegTest extends LeaseModuleIntegTestAbstract {
         @Test
         public void whenStillHasInvoiceItems() throws Exception {
             // given
-            Lease leaseWithInvoiceItem = leaseRepository.findLeaseByReference(LeaseForKalPoison001Nl.REF);
+            Lease leaseWithInvoiceItem = Lease_enum.KalPoison001Nl.findUsing(serviceRegistry);
             LeaseItem leaseItem = leaseWithInvoiceItem.findFirstItemOfType(LeaseItemType.RENT);
             assertThat(leaseItem).isNotNull();
             final LeaseTerm term = leaseItem.getTerms().first();

@@ -28,7 +28,7 @@ import org.junit.Test;
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 
 import org.estatio.module.charge.dom.ChargeRepository;
-import org.estatio.module.charge.fixtures.charges.refdata.ChargeRefData;
+import org.estatio.module.charge.fixtures.charges.enums.Charge_enum;
 import org.estatio.module.invoice.dom.PaymentMethod;
 import org.estatio.module.lease.dom.InvoicingFrequency;
 import org.estatio.module.lease.dom.Lease;
@@ -37,9 +37,17 @@ import org.estatio.module.lease.dom.LeaseItem;
 import org.estatio.module.lease.dom.LeaseItemSourceRepository;
 import org.estatio.module.lease.dom.LeaseItemType;
 import org.estatio.module.lease.dom.LeaseRepository;
-import org.estatio.module.lease.fixtures.lease.LeaseForOxfPoison003Gb;
-import org.estatio.module.lease.fixtures.lease.LeaseForOxfTopModel001Gb;
-import org.estatio.module.lease.fixtures.lease.LeaseItemAndTermsForOxfTopModel001;
+import org.estatio.module.lease.fixtures.lease.enums.Lease_enum;
+import org.estatio.module.lease.fixtures.leaseitems.deposits.personas.LeaseItemAndLeaseTermForDepositForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.discount.personas.LeaseItemAndLeaseTermForDiscountForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.entryfee.personas.LeaseItemAndLeaseTermForEntryFeeForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.marketing.personas.LeaseItemAndLeaseTermForMarketingForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.percentage.personas.LeaseItemAndLeaseTermForPercentageForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.rent.personas.LeaseItemAndLeaseTermForRentForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.servicecharge.personas.LeaseItemAndLeaseTermForServiceChargeForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.svcchgbudgeted.personas.LeaseItemForServiceChargeBudgetedForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.tax.personas.LeaseItemAndLeaseTermForTaxForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.turnoverrent.personas.LeaseItemAndLeaseTermForTurnoverRentForOxfTopModel001Gb;
 import org.estatio.module.lease.integtests.LeaseModuleIntegTestAbstract;
 
 public class LeaseItemSourceRepository_IntegTest extends LeaseModuleIntegTestAbstract {
@@ -50,8 +58,18 @@ public class LeaseItemSourceRepository_IntegTest extends LeaseModuleIntegTestAbs
             @Override
             protected void execute(ExecutionContext executionContext) {
 
-                executionContext.executeChild(this, new LeaseItemAndTermsForOxfTopModel001());
-                executionContext.executeChild(this, new LeaseForOxfPoison003Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForRentForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForServiceChargeForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemForServiceChargeBudgetedForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForTurnoverRentForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForPercentageForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForDiscountForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForEntryFeeForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForTaxForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForDepositForOxfTopModel001Gb());
+                executionContext.executeChild(this, new LeaseItemAndLeaseTermForMarketingForOxfTopModel001Gb());
+
+                executionContext.executeChild(this, Lease_enum.OxfPoison003Gb.toBuilderScript());
             }
         });
     }
@@ -75,7 +93,7 @@ public class LeaseItemSourceRepository_IntegTest extends LeaseModuleIntegTestAbs
 
     @Before
     public void setUp() throws Exception {
-        lease = leaseRepository.findLeaseByReference(LeaseForOxfTopModel001Gb.REF);
+        lease = Lease_enum.OxfTopModel001Gb.findUsing(serviceRegistry);
         depositItem = lease.findFirstItemOfType(LeaseItemType.DEPOSIT);
         rentItem = lease.findFirstItemOfType(LeaseItemType.RENT);
         serviceChargeItem = lease.findFirstItemOfType(LeaseItemType.SERVICE_CHARGE);
@@ -107,7 +125,10 @@ public class LeaseItemSourceRepository_IntegTest extends LeaseModuleIntegTestAbs
     public void findByItemTest() throws Exception {
 
         // given
-        LeaseItem newDeposit = lease.newItem(LeaseItemType.DEPOSIT, LeaseAgreementRoleTypeEnum.LANDLORD, chargeRepository.findByReference(ChargeRefData.GB_DEPOSIT), InvoicingFrequency.QUARTERLY_IN_ADVANCE, PaymentMethod.DIRECT_DEBIT, new LocalDate(2016, 01, 01));
+        LeaseItem newDeposit = lease.newItem(
+                LeaseItemType.DEPOSIT, LeaseAgreementRoleTypeEnum.LANDLORD,
+                Charge_enum.GbDeposit.findUsing(serviceRegistry),
+                InvoicingFrequency.QUARTERLY_IN_ADVANCE, PaymentMethod.DIRECT_DEBIT, new LocalDate(2016, 1, 1));
 
         // when
         newDeposit.newSourceItem(serviceChargeItem);

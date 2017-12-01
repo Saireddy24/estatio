@@ -23,18 +23,21 @@ import org.joda.time.LocalDate;
 import org.apache.isis.applib.fixturescripts.BuilderScriptAbstract;
 
 import org.estatio.module.asset.dom.Property;
+import org.estatio.module.asset.dom.role.FixedAssetRole;
 import org.estatio.module.asset.dom.role.FixedAssetRoleTypeEnum;
 import org.estatio.module.party.dom.Party;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
-@EqualsAndHashCode(of={"property", "manager"})
+@EqualsAndHashCode(of={"property", "manager"}, callSuper = false)
+@ToString(of={"property", "manager"})
 @Accessors(chain = true)
-public class PropertyManagerBuilder
-        extends BuilderScriptAbstract<PropertyManagerBuilder> {
+public final class PropertyManagerBuilder
+        extends BuilderScriptAbstract<FixedAssetRole, PropertyManagerBuilder> {
 
     @Getter @Setter
     private Property property;
@@ -48,6 +51,9 @@ public class PropertyManagerBuilder
     @Getter @Setter
     private LocalDate endDate;
 
+    @Getter
+    private FixedAssetRole object;
+
     @Override
     protected void execute(final ExecutionContext executionContext) {
 
@@ -57,7 +63,7 @@ public class PropertyManagerBuilder
         //defaultParam("startDate", executionContext, property.getAcquireDate());
 
         //wrap(property).newRole(FixedAssetRoleTypeEnum.ASSET_MANAGER, manager, startDate, endDate);
-        property.addRoleIfDoesNotExist(manager, FixedAssetRoleTypeEnum.ASSET_MANAGER, startDate, endDate);
+        object = property.addRoleIfDoesNotExist(manager, FixedAssetRoleTypeEnum.ASSET_MANAGER, startDate, endDate);
 
     }
 

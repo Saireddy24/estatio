@@ -32,7 +32,7 @@ import org.apache.isis.applib.fixturescripts.FixtureScript;
 import org.apache.isis.applib.services.clock.ClockService;
 
 import org.estatio.module.charge.dom.ChargeRepository;
-import org.estatio.module.charge.fixtures.charges.refdata.ChargeRefData;
+import org.estatio.module.charge.fixtures.charges.enums.Charge_enum;
 import org.estatio.module.invoice.dom.Invoice;
 import org.estatio.module.invoice.dom.InvoiceItem;
 import org.estatio.module.invoice.dom.InvoiceRunType;
@@ -51,13 +51,24 @@ import org.estatio.module.lease.dom.invoicing.InvoiceCalculationSelection;
 import org.estatio.module.lease.dom.invoicing.InvoiceForLease;
 import org.estatio.module.lease.dom.invoicing.InvoiceForLeaseRepository;
 import org.estatio.module.lease.dom.invoicing.InvoiceItemForLease;
-import org.estatio.module.lease.fixtures.lease.LeaseForOxfMediaX002Gb;
-import org.estatio.module.lease.fixtures.lease.LeaseForOxfTopModel001Gb;
-import org.estatio.module.lease.fixtures.lease.LeaseItemAndTermsForOxfMediax002Gb;
-import org.estatio.module.lease.fixtures.lease.LeaseItemAndTermsForOxfTopModel001;
+import org.estatio.module.lease.fixtures.lease.enums.Lease_enum;
+import org.estatio.module.lease.fixtures.leaseitems.deposits.personas.LeaseItemAndLeaseTermForDepositForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.discount.personas.LeaseItemAndLeaseTermForDiscountForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.entryfee.personas.LeaseItemAndLeaseTermForEntryFeeForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.marketing.personas.LeaseItemAndLeaseTermForMarketingForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.percentage.personas.LeaseItemAndLeaseTermForPercentageForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.rent.personas.LeaseItemAndLeaseTermForRentForOxfMediax002Gb;
+import org.estatio.module.lease.fixtures.leaseitems.rent.personas.LeaseItemAndLeaseTermForRentForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.servicecharge.personas.LeaseItemAndLeaseTermForServiceChargeForOxfMediax002Gb;
+import org.estatio.module.lease.fixtures.leaseitems.servicecharge.personas.LeaseItemAndLeaseTermForServiceChargeForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.svcchgbudgeted.personas.LeaseItemForServiceChargeBudgetedForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.tax.personas.LeaseItemAndLeaseTermForTaxForOxfTopModel001Gb;
+import org.estatio.module.lease.fixtures.leaseitems.turnoverrent.personas.LeaseItemAndLeaseTermForTurnoverRentForOxfMediax002Gb;
+import org.estatio.module.lease.fixtures.leaseitems.turnoverrent.personas.LeaseItemAndLeaseTermForTurnoverRentForOxfTopModel001Gb;
 import org.estatio.module.lease.integtests.LeaseModuleIntegTestAbstract;
 
 import static org.assertj.core.api.Assertions.assertThat;
+import static org.incode.module.base.integtests.VT.ld;
 
 public class LeaseTermsForDeposit_IntegTest extends LeaseModuleIntegTestAbstract {
 
@@ -86,8 +97,19 @@ public class LeaseTermsForDeposit_IntegTest extends LeaseModuleIntegTestAbstract
                 @Override
                 protected void execute(ExecutionContext executionContext) {
 
-                    executionContext.executeChild(this, new LeaseForOxfTopModel001Gb());
-                    executionContext.executeChild(this, new LeaseItemAndTermsForOxfTopModel001());
+                    executionContext.executeChild(this, Lease_enum.OxfTopModel001Gb.toBuilderScript());
+
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForRentForOxfTopModel001Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForServiceChargeForOxfTopModel001Gb());
+                    executionContext.executeChild(this, new LeaseItemForServiceChargeBudgetedForOxfTopModel001Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForTurnoverRentForOxfTopModel001Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForPercentageForOxfTopModel001Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForDiscountForOxfTopModel001Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForEntryFeeForOxfTopModel001Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForTaxForOxfTopModel001Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForDepositForOxfTopModel001Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForMarketingForOxfTopModel001Gb());
+
                 }
             });
         }
@@ -96,8 +118,8 @@ public class LeaseTermsForDeposit_IntegTest extends LeaseModuleIntegTestAbstract
         public void invoiceScenarioTest() throws Exception {
 
             // given
-            startDate = new LocalDate(2010, 10, 1);
-            topmodelLease = leaseRepository.findLeaseByReference(LeaseForOxfTopModel001Gb.REF);
+            startDate = ld(2010, 10, 1);
+            topmodelLease = Lease_enum.OxfTopModel001Gb.findUsing(serviceRegistry);
 
             // when
             invoiceService.calculateLegacy(
@@ -169,12 +191,15 @@ public class LeaseTermsForDeposit_IntegTest extends LeaseModuleIntegTestAbstract
                 @Override
                 protected void execute(ExecutionContext executionContext) {
 
-                    executionContext.executeChild(this, new LeaseForOxfMediaX002Gb());
-                    executionContext.executeChild(this, new LeaseItemAndTermsForOxfMediax002Gb());
+                    executionContext.executeChild(this, Lease_enum.OxfMediaX002Gb.toBuilderScript());
+
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForRentForOxfMediax002Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForServiceChargeForOxfMediax002Gb());
+                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForTurnoverRentForOxfMediax002Gb());
                 }
             });
 
-            leaseForMedia = leaseRepository.findLeaseByReference(LeaseForOxfMediaX002Gb.REF);
+            leaseForMedia = Lease_enum.OxfMediaX002Gb.findUsing(serviceRegistry);
             rentItem = leaseForMedia.findFirstItemOfType(LeaseItemType.RENT);
             LeaseTermForIndexable firstRentTerm = (LeaseTermForIndexable) rentItem.getTerms().first();
             assertThat(firstRentTerm.getBaseValue()).isEqualTo(new BigDecimal("20000.00"));
@@ -185,10 +210,16 @@ public class LeaseTermsForDeposit_IntegTest extends LeaseModuleIntegTestAbstract
         public void depositInvoicedInArrearsTest() {
 
             // given 2 identical deposit items: 1 invoice in arrears, 1 invoiced in advance
-            LeaseItem depositItemInArrears = wrap(leaseForMedia).newItem(LeaseItemType.DEPOSIT, LeaseAgreementRoleTypeEnum.LANDLORD, chargeRepository.findByReference(ChargeRefData.GB_DEPOSIT), InvoicingFrequency.QUARTERLY_IN_ARREARS, PaymentMethod.DIRECT_DEBIT, startDateDeposit);
+            LeaseItem depositItemInArrears = wrap(leaseForMedia).newItem(
+                    LeaseItemType.DEPOSIT, LeaseAgreementRoleTypeEnum.LANDLORD,
+                    Charge_enum.GbDeposit.findUsing(serviceRegistry),
+                    InvoicingFrequency.QUARTERLY_IN_ARREARS, PaymentMethod.DIRECT_DEBIT, startDateDeposit);
             wrap(depositItemInArrears).newSourceItem(rentItem);
 
-            LeaseItem depositItemInAdvance = leaseForMedia.newItem(LeaseItemType.DEPOSIT, LeaseAgreementRoleTypeEnum.LANDLORD, chargeRepository.findByReference(ChargeRefData.GB_DEPOSIT), InvoicingFrequency.QUARTERLY_IN_ADVANCE, PaymentMethod.DIRECT_DEBIT, startDateDeposit);
+            LeaseItem depositItemInAdvance = leaseForMedia.newItem(
+                    LeaseItemType.DEPOSIT, LeaseAgreementRoleTypeEnum.LANDLORD,
+                    Charge_enum.GbDeposit.findUsing(serviceRegistry),
+                    InvoicingFrequency.QUARTERLY_IN_ADVANCE, PaymentMethod.DIRECT_DEBIT, startDateDeposit);
             wrap(depositItemInAdvance).newSourceItem(rentItem);
 
             LeaseTermForDeposit termInArrears = (LeaseTermForDeposit) wrap(depositItemInArrears).newTerm(startDateDeposit, null);

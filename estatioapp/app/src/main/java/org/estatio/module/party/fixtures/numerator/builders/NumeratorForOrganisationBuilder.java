@@ -4,9 +4,10 @@ import java.math.BigInteger;
 
 import javax.inject.Inject;
 
+import org.apache.isis.applib.fixturescripts.BuilderScriptAbstract;
+
 import org.incode.module.country.dom.impl.Country;
 
-import org.apache.isis.applib.fixturescripts.BuilderScriptAbstract;
 import org.estatio.module.countryapptenancy.dom.EstatioApplicationTenancyRepositoryForCountry;
 import org.estatio.module.numerator.dom.Numerator;
 import org.estatio.module.numerator.dom.NumeratorRepository;
@@ -14,12 +15,14 @@ import org.estatio.module.numerator.dom.NumeratorRepository;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
-@EqualsAndHashCode(of={"name", "format", "country"})
+@EqualsAndHashCode(of={"name", "format", "country"}, callSuper = false)
+@ToString(of={"name", "format", "country"})
 @Accessors(chain = true)
-public class NumeratorForOrganisationBuilder
-        extends BuilderScriptAbstract<NumeratorForOrganisationBuilder> {
+public final class NumeratorForOrganisationBuilder
+        extends BuilderScriptAbstract<Numerator, NumeratorForOrganisationBuilder> {
 
     @Getter @Setter
     String name;
@@ -31,7 +34,7 @@ public class NumeratorForOrganisationBuilder
     Country country;
 
     @Getter
-    Numerator numerator;
+    Numerator object;
 
     @Override
     protected void execute(ExecutionContext executionContext) {
@@ -44,6 +47,8 @@ public class NumeratorForOrganisationBuilder
                 .createGlobalNumerator(name, format, BigInteger.ZERO,  estatioApplicationTenancyRepository.findOrCreateTenancyFor(country));
 
         executionContext.addResult(this, name, numerator);
+
+        object = numerator;
     }
 
     @Inject

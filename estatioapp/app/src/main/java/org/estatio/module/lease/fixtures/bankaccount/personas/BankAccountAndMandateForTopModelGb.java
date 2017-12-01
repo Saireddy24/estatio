@@ -18,14 +18,14 @@
  */
 package org.estatio.module.lease.fixtures.bankaccount.personas;
 
-import org.estatio.module.assetfinancial.fixtures.bankaccount.personas.BankAccountAndFaFaForTopModelGb;
-import org.estatio.module.lease.fixtures.lease.LeaseForOxfTopModel001Gb;
+import org.estatio.module.assetfinancial.fixtures.bankaccountfafa.enums.BankAccount_enum;
 import org.estatio.module.bankmandate.dom.Scheme;
 import org.estatio.module.bankmandate.dom.SequenceType;
+import org.estatio.module.lease.fixtures.lease.enums.Lease_enum;
 
 public class BankAccountAndMandateForTopModelGb extends BankAccountAndMandateAbstract {
 
-    public static final String REF = BankAccountAndFaFaForTopModelGb.REF;
+    public static final String REF = BankAccount_enum.TopModelGb.getIban();
     public static final int SEQUENCE = 1;
     public static final SequenceType SEQUENCE_TYPE = SequenceType.FIRST;
     public static final Scheme SCHEME = Scheme.CORE;
@@ -42,12 +42,12 @@ public class BankAccountAndMandateForTopModelGb extends BankAccountAndMandateAbs
     protected void execute(ExecutionContext executionContext) {
 
         // prereqs
-        executionContext.executeChild(this, new LeaseForOxfTopModel001Gb());
-        executionContext.executeChild(this, new BankAccountAndFaFaForTopModelGb());
+        executionContext.executeChild(this, Lease_enum.OxfTopModel001Gb.toBuilderScript());
+        executionContext.executeChild(this, BankAccount_enum.TopModelGb.toBuilderScript());
 
         // exec
         createBankMandate(
-                LeaseForOxfTopModel001Gb.PARTY_REF_TENANT,
+                Lease_enum.OxfTopModel001Gb.getTenant_d().getRef(),
                 REF, SEQUENCE, SEQUENCE_TYPE, SCHEME,
                 executionContext);
     }

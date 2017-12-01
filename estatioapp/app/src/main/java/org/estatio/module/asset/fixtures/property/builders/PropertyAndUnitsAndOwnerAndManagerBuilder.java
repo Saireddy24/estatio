@@ -23,35 +23,34 @@ import java.util.List;
 
 import javax.inject.Inject;
 
+import com.google.common.collect.Lists;
+
 import org.joda.time.LocalDate;
 
 import org.apache.isis.applib.fixturescripts.BuilderScriptAbstract;
 
-import org.isisaddons.module.security.dom.tenancy.ApplicationTenancyRepository;
+import org.isisaddons.module.fakedata.dom.FakeDataService;
 
 import org.incode.module.country.dom.impl.Country;
-import org.incode.module.country.dom.impl.CountryRepository;
-import org.incode.module.country.dom.impl.StateRepository;
 
 import org.estatio.module.asset.dom.Property;
-import org.estatio.module.asset.dom.PropertyRepository;
 import org.estatio.module.asset.dom.PropertyType;
 import org.estatio.module.asset.dom.Unit;
-import org.estatio.module.asset.dom.UnitRepository;
 import org.estatio.module.asset.dom.UnitType;
-import org.estatio.module.base.platform.fake.EstatioFakeDataService;
+import org.estatio.module.asset.dom.role.FixedAssetRole;
 import org.estatio.module.party.dom.Party;
-import org.estatio.module.party.dom.PartyRepository;
 
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
-@EqualsAndHashCode(of={"reference"})
+@EqualsAndHashCode(of={"reference"}, callSuper = false)
+@ToString(of={"reference"})
 @Accessors(chain = true)
-public class PropertyAndUnitsAndOwnerAndManagerBuilder
-        extends BuilderScriptAbstract<PropertyAndUnitsAndOwnerAndManagerBuilder> {
+public final class PropertyAndUnitsAndOwnerAndManagerBuilder
+        extends BuilderScriptAbstract<Property, PropertyAndUnitsAndOwnerAndManagerBuilder> {
 
     @Getter @Setter
     private String reference;
@@ -95,21 +94,20 @@ public class PropertyAndUnitsAndOwnerAndManagerBuilder
     private Integer numberOfUnits;
 
     @Getter
-    private Property property;
+    private Property object;
     @Getter
-    private List<Unit> units;
+    private List<Unit> units = Lists.newArrayList();
     @Getter
-    private Party ownerObj;
+    private FixedAssetRole ownerRole;
     @Getter
-    private Party managerObj;
+    private FixedAssetRole managerrole;
 
     @Override
     protected void execute(final ExecutionContext executionContext) {
 
-        defaultParam("numberOfUnits", executionContext, fakeDataService.values().anInt(10,20));
+        defaultParam("numberOfUnits", executionContext, fakeDataService.ints().between(10,20));
 
-        final PropertyBuilder propertyBuilder = new PropertyBuilder();
-        property = propertyBuilder
+        final Property property = new PropertyBuilder()
                 .setReference(reference)
                 .setName(name)
                 .setCity(city)
@@ -119,46 +117,38 @@ public class PropertyAndUnitsAndOwnerAndManagerBuilder
                 .setOpeningDate(openingDate)
                 .setLocationStr(locationStr)
                 .build(this, executionContext)
-                .getProperty();
-
-
+                .getObject();
 
         if(owner != null) {
-            final PropertyOwnerBuilder propertyOwnerBuilder = new PropertyOwnerBuilder();
-            ownerObj = propertyOwnerBuilder
+            ownerRole = new PropertyOwnerBuilder()
                     .setProperty(property)
                     .setOwner(owner)
                     .setStartDate(ownerStartDate)
                     .setEndDate(ownerEndDate)
                     .build(this, executionContext)
-                    .getOwner();
-
-//            property.addRoleIfDoesNotExist(owner, FixedAssetRoleTypeEnum.PROPERTY_OWNER, ownerStartDate, ownerEndDate);
-//            wrap(property).newRole(FixedAssetRoleTypeEnum.PROPERTY_OWNER, getOwner(), getAcquireDate(), null);
+                    .getObject();
         }
+
         if(manager != null) {
-            final PropertyManagerBuilder propertyManagerBuilder = new PropertyManagerBuilder();
-            managerObj = propertyManagerBuilder
+            managerrole = new PropertyManagerBuilder()
                     .setProperty(property)
                     .setManager(manager)
                     .setStartDate(managerStartDate)
                     .setEndDate(managerEndDate)
                     .build(this, executionContext)
-                    .getManager();
-
-//            property.addRoleIfDoesNotExist(manager, FixedAssetRoleTypeEnum.ASSET_MANAGER, managerStartDate, managerEndDate);
-//            wrap(property).newRole(FixedAssetRoleTypeEnum.ASSET_MANAGER, getManager(), getAcquireDate(), null);
+                    .getObject();
         }
 
         for (int i = 0; i < getNumberOfUnits(); i++) {
             int unitNumber = i + 1;
-            wrap(property).newUnit(String.format("%s-%03d", property.getReference(), unitNumber), "Unit " + unitNumber, unitType(i)).setArea(new BigDecimal((i + 1) * 100));
-
-//            final String unitRef = buildUnitReference(property.getReference(), i);
-//            final UnitType unitType = fakeDataService.collections().anEnum(UnitType.class);
-//            final String unitName = fakeDataService.name().firstName();
-//            wrap(property).newUnit(unitRef, unitName, unitType);
+            final Unit unit = wrap(property)
+                    .newUnit(String.format("%s-%03d", property.getReference(), unitNumber), "Unit " + unitNumber,
+                            unitType(i));
+            unit.setArea(new BigDecimal((i + 1) * 100));
+            units.add(unit);
         }
+
+        object = property;
     }
 
     private UnitType unitType(int n) {
@@ -170,28 +160,9 @@ public class PropertyAndUnitsAndOwnerAndManagerBuilder
         return String.format("%1$s-%2$03d", propertyReference, unitNum);
     }
 
-    // //////////////////////////////////////
 
     @Inject
-    protected StateRepository stateRepository;
-
-    @Inject
-    protected CountryRepository countryRepository;
-
-    @Inject
-    protected PropertyRepository propertyRepository;
-
-    @Inject
-    protected UnitRepository unitRepository;
-
-    @Inject
-    protected PartyRepository partyRepository;
-
-    @Inject
-    protected ApplicationTenancyRepository applicationTenancyRepository;
-
-    @Inject
-    EstatioFakeDataService fakeDataService;
+    FakeDataService fakeDataService;
 
 
 }

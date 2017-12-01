@@ -24,15 +24,16 @@ import javax.inject.Inject;
 
 import org.estatio.module.asset.dom.Property;
 import org.estatio.module.asset.dom.PropertyRepository;
-import org.estatio.module.asset.fixtures.property.personas.PropertyAndUnitsAndOwnerAndManagerForOxfGb;
+import org.estatio.module.asset.fixtures.property.enums.PropertyAndUnitsAndOwnerAndManager_enum;
+import org.estatio.module.asset.fixtures.property.enums.Property_enum;
+import org.estatio.module.base.platform.fixturesupport.PersonaScriptAbstract;
 import org.estatio.module.capex.dom.project.Project;
-import org.estatio.module.capex.fixtures.project.ProjectAbstract;
 import org.estatio.module.capex.fixtures.project.ProjectBuilder;
 import org.estatio.module.capex.fixtures.project.enums.Project_enum;
 import org.estatio.module.charge.dom.Charge;
 import org.estatio.module.charge.dom.ChargeRepository;
 
-public class ProjectForOxf extends ProjectAbstract {
+public class ProjectForOxf extends PersonaScriptAbstract {
 
     public static final Project_enum data = Project_enum.OxfProject;
 
@@ -40,7 +41,7 @@ public class ProjectForOxf extends ProjectAbstract {
     protected void execute(ExecutionContext executionContext) {
 
         // prereqs
-        executionContext.executeChild(this, new PropertyAndUnitsAndOwnerAndManagerForOxfGb());
+        executionContext.executeChild(this, PropertyAndUnitsAndOwnerAndManager_enum.OxfGb.toBuilderScript());
 
         // exec
 
@@ -53,10 +54,10 @@ public class ProjectForOxf extends ProjectAbstract {
                 .setAtPath(data.getApplicationTenancy().getPath())
                 .setParent(null)
                 .build(this, executionContext)
-                .getProject();
+                .getObject();
 
         Charge charge = chargeRepository.findByReference("WORKS");
-        Property Oxf = propertyRepository.findPropertyByReference(PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
+        Property Oxf = Property_enum.OxfGb.findUsing(serviceRegistry);
         projectOxf2.addItem(charge, "works", new BigDecimal("40000.00"), null, null,Oxf,null );
 
     }

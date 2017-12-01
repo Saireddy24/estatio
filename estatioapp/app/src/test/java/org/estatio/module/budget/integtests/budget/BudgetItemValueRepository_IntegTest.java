@@ -13,14 +13,14 @@ import org.apache.isis.applib.fixturescripts.FixtureScript;
 
 import org.estatio.module.asset.dom.Property;
 import org.estatio.module.asset.dom.PropertyRepository;
-import org.estatio.module.asset.fixtures.property.personas.PropertyAndUnitsAndOwnerAndManagerForOxfGb;
+import org.estatio.module.asset.fixtures.property.enums.Property_enum;
 import org.estatio.module.budget.dom.budget.Budget;
 import org.estatio.module.budget.dom.budget.BudgetRepository;
 import org.estatio.module.budget.dom.budgetcalculation.BudgetCalculationType;
 import org.estatio.module.budget.dom.budgetitem.BudgetItem;
 import org.estatio.module.budget.dom.budgetitem.BudgetItemValue;
 import org.estatio.module.budget.dom.budgetitem.BudgetItemValueRepository;
-import org.estatio.module.budget.fixtures.budgets.personas.BudgetsForOxf;
+import org.estatio.module.budget.fixtures.budgets.enums.Budget_enum;
 import org.estatio.module.budget.integtests.BudgetModuleIntegTestAbstract;
 
 import static org.assertj.core.api.Assertions.assertThat;
@@ -38,7 +38,9 @@ public class BudgetItemValueRepository_IntegTest extends BudgetModuleIntegTestAb
         runFixtureScript(new FixtureScript() {
             @Override
             protected void execute(final ExecutionContext executionContext) {
-                executionContext.executeChild(this, new BudgetsForOxf());
+                executionContext.executeChild(this, Budget_enum.OxfBudget2015.toBuilderScript());
+                executionContext.executeChild(this, Budget_enum.OxfBudget2016.toBuilderScript());
+
             }
         });
     }
@@ -47,7 +49,7 @@ public class BudgetItemValueRepository_IntegTest extends BudgetModuleIntegTestAb
     public void findByBudgetItemAndType() {
 
         // given
-        Property property = propertyRepository.findPropertyByReference(PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
+        Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
         Budget budget = budgetRepository.findByPropertyAndStartDate(property, new LocalDate(2015, 01, 01));
         BudgetItem budgetItem = budget.getItems().first();
 
@@ -65,7 +67,7 @@ public class BudgetItemValueRepository_IntegTest extends BudgetModuleIntegTestAb
     public void findUniqueTest(){
 
         // given
-        Property property = propertyRepository.findPropertyByReference(PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
+        Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
         Budget budget = budgetRepository.findByPropertyAndStartDate(property, new LocalDate(2015, 01, 01));
         BudgetItem budgetItem = budget.getItems().first();
 
@@ -88,7 +90,7 @@ public class BudgetItemValueRepository_IntegTest extends BudgetModuleIntegTestAb
 
         // given
         LocalDate budgetStart = new LocalDate(2015, 01, 01);
-        Property property = propertyRepository.findPropertyByReference(PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
+        Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
         Budget budget = budgetRepository.findByPropertyAndStartDate(property, budgetStart);
         BudgetItem budgetItem = budget.getItems().first();
 
@@ -110,7 +112,7 @@ public class BudgetItemValueRepository_IntegTest extends BudgetModuleIntegTestAb
 
         // given
         LocalDate budgetStart = new LocalDate(2015, 1, 1);
-        Property property = propertyRepository.findPropertyByReference(PropertyAndUnitsAndOwnerAndManagerForOxfGb.REF);
+        Property property = Property_enum.OxfGb.findUsing(serviceRegistry);
         Budget budget = budgetRepository.findByPropertyAndStartDate(property, budgetStart);
         BudgetItem budgetItem = budget.getItems().first();
 

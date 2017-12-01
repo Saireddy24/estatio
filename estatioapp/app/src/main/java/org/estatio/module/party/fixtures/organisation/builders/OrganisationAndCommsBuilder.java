@@ -30,11 +30,14 @@ import org.estatio.module.party.fixtures.organisation.enums.OrganisationComms_en
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
+import lombok.ToString;
 import lombok.experimental.Accessors;
 
-@EqualsAndHashCode(of={"partyReference", "address1", "phone", "fax", "emailAddress"})
+@EqualsAndHashCode(of={"partyReference", "comms"}, callSuper = false)
+@ToString(of={"partyReference", "comms"})
 @Accessors(chain = true)
-public class OrganisationAndCommsBuilder extends BuilderScriptAbstract<OrganisationAndCommsBuilder> {
+public final class OrganisationAndCommsBuilder
+        extends BuilderScriptAbstract<Organisation, OrganisationAndCommsBuilder> {
 
     @Getter @Setter
     private String atPath;
@@ -52,7 +55,7 @@ public class OrganisationAndCommsBuilder extends BuilderScriptAbstract<Organisat
     private OrganisationComms_enum[] comms;
 
     @Getter
-    private Organisation organisation;
+    private Organisation object;
 
     @Getter
     private PostalAddress postalAddress;
@@ -70,24 +73,24 @@ public class OrganisationAndCommsBuilder extends BuilderScriptAbstract<Organisat
     protected void execute(ExecutionContext executionContext) {
 
         final OrganisationBuilder organisationBuilder = new OrganisationBuilder();
-        this.organisation = organisationBuilder
+        this.object = organisationBuilder
                 .setAtPath(atPath)
-                .setPartyName(partyName)
-                .setPartyReference(partyReference)
+                .setName(partyName)
+                .setReference(partyReference)
                 .setUseNumeratorForReference(useNumeratorForReference)
                 .build(this, executionContext)
-                .getOrganisation();
+                .getObject();
 
         for (final OrganisationComms_enum comms : this.comms) {
             final OrganisationCommsBuilder organisationCommsBuilder = new OrganisationCommsBuilder();
             organisationCommsBuilder
-                    .setOrganisation(organisation)
+                    .setOrganisation(object)
                     .setAddress1(comms.getAddress1())
                     .setAddress2(comms.getAddress2())
                     .setCity(comms.getCity())
                     .setPostalCode(comms.getPostalCode())
                     .setStateReference(comms.getStateReference())
-                    .setCountry(comms.getCountry())
+                    .setCountry_d(comms.getCountry())
                     .setLegalAddress(comms.getLegalAddress())
                     .setPhone(comms.getPhone())
                     .setFax(comms.getFax())
