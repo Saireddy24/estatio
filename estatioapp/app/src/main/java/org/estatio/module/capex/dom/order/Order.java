@@ -1,6 +1,7 @@
 package org.estatio.module.capex.dom.order;
 
 import java.math.BigDecimal;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -72,6 +73,8 @@ import org.estatio.module.charge.dom.Charge;
 import org.estatio.module.charge.dom.ChargeRepository;
 import org.estatio.module.financial.dom.BankAccountRepository;
 import org.estatio.module.financial.dom.utils.IBANValidator;
+import org.estatio.module.party.app.services.ChamberOfCommerceCodeLookUpService;
+import org.estatio.module.party.app.services.OrganisationNameNumberViewModel;
 import org.estatio.module.party.dom.Organisation;
 import org.estatio.module.party.dom.OrganisationRepository;
 import org.estatio.module.party.dom.Party;
@@ -342,7 +345,14 @@ public class Order extends UdoDomainObject2<Order> implements Stateful {
     public Order editSeller(
             @Nullable
             final Supplier supplier,
+            @Nullable
+            final OrganisationNameNumberViewModel supplierCheck,
+            final boolean applyCheckedSupplierDetails,
             final boolean createRoleIfRequired){
+        Organisation organisation = supplier.getOrganisation();
+        if (applyCheckedSupplierDetails && supplierCheck!=null) {
+            supplierCheck.applyChamberOfCommerceCodeAndNameTo(organisation);
+        }
         setSeller(supplier.getOrganisation());
         if(supplier != null && createRoleIfRequired) {
             partyRoleRepository.findOrCreate(supplier.getOrganisation(), IncomingInvoiceRoleTypeEnum.SUPPLIER);
@@ -350,7 +360,11 @@ public class Order extends UdoDomainObject2<Order> implements Stateful {
         return this;
     }
 
-    public String validateEditSeller(final Supplier supplier, final boolean createRoleIfRequired){
+    public String validateEditSeller(
+            final Supplier supplier,
+            final OrganisationNameNumberViewModel supplierCheck,
+            final boolean applyCheckedSupplierDetails,
+            final boolean createRoleIfRequired){
         if(supplier != null && !createRoleIfRequired) {
             // requires that the supplier already has this role
             return partyRoleRepository.validateThat(supplier.getOrganisation(), IncomingInvoiceRoleTypeEnum.SUPPLIER);
@@ -360,6 +374,14 @@ public class Order extends UdoDomainObject2<Order> implements Stateful {
 
     public List<Supplier> autoComplete0EditSeller(final String search){
         return partyRepository.autoCompleteSupplier(search);
+    }
+    public List<OrganisationNameNumberViewModel> choices1EditSeller(final Supplier supplier){
+        if (supplier==null) return null;
+        if (supplier.getOrganisation().getChamberOfCommerceCode()==null) {
+            return chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByOrganisation(supplier.getOrganisation());
+        } else {
+            return Arrays.asList(chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByCode(supplier.getOrganisation()));
+        }
     }
 
     public Supplier default0EditSeller(){
@@ -973,6 +995,9 @@ public class Order extends UdoDomainObject2<Order> implements Stateful {
 
     @Inject
     PartyRepository partyRepository;
+
+    @Inject
+    ChamberOfCommerceCodeLookUpService chamberOfCommerceCodeLookUpService;
 
 
 }

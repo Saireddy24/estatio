@@ -14,8 +14,6 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
-import com.google.common.base.Strings;
-
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.wicketstuff.pdfjs.Scale;
@@ -185,15 +183,12 @@ public abstract class IncomingDocViewModel<T> implements HintStore.HintIdProvide
     public IncomingDocViewModel editSeller(
             final Supplier supplier,
             @Nullable
-            final OrganisationNameNumberViewModel checkSupplier,
+            final OrganisationNameNumberViewModel supplierCheck,
+            final boolean applyCheckedSupplierDetails,
             final boolean createRoleIfRequired) {
         Organisation organisation = supplier.getOrganisation();
-        if (checkSupplier!=null && checkSupplier.getChamberOfCommerceCode()!=null){
-            //TODO: factor out setChamberOfCommerceCodeIfNotAlready();
-            if (Strings.isNullOrEmpty(organisation.getChamberOfCommerceCode()))  organisation.setChamberOfCommerceCode(checkSupplier.getChamberOfCommerceCode());
-        }
-        if (checkSupplier!=null && checkSupplier.getOrganisationName()!=null && !checkSupplier.getOrganisationName().equals(organisation.getName())){
-            organisation.setName(checkSupplier.getOrganisationName());
+        if (applyCheckedSupplierDetails && supplierCheck!=null) {
+            supplierCheck.applyChamberOfCommerceCodeAndNameTo(organisation);
         }
         setSeller(organisation);
         if(createRoleIfRequired) {
@@ -219,7 +214,7 @@ public abstract class IncomingDocViewModel<T> implements HintStore.HintIdProvide
     protected void onEditSeller(final Party seller){
     }
 
-    public String validateEditSeller(final Supplier supplier, final OrganisationNameNumberViewModel candidate, final boolean createRoleIfRequired){
+    public String validateEditSeller(final Supplier supplier, final OrganisationNameNumberViewModel candidate, final boolean applyCheckedSupplierDetails, final boolean createRoleIfRequired){
         if(!createRoleIfRequired) {
             // requires that the supplier already has this role
             return partyRoleRepository.validateThat(supplier.getOrganisation(), IncomingInvoiceRoleTypeEnum.SUPPLIER);

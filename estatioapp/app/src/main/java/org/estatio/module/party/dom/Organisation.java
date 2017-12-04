@@ -26,6 +26,8 @@ import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.Persistent;
 import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
+import com.google.common.base.Strings;
+
 import org.joda.time.LocalDate;
 
 import org.apache.isis.applib.annotation.CollectionLayout;
@@ -34,6 +36,7 @@ import org.apache.isis.applib.annotation.Editing;
 import org.apache.isis.applib.annotation.MemberOrder;
 import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Parameter;
+import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.Property;
 import org.apache.isis.schema.utils.jaxbadapters.PersistentEntityAdapter;
 
@@ -147,8 +150,15 @@ public class Organisation
         return previousNameEndDate.isAfter(getClockService().now()) ? "You can not select a future end date" : null;
     }
 
+    @Programmatic
+    public void setChamberOfCommerceCodeIfNotAlready(final String chamberOfCommerceCode) {
+        if (Strings.isNullOrEmpty(getChamberOfCommerceCode()))
+            setChamberOfCommerceCode(chamberOfCommerceCode);
+    }
+
+
     @Inject
-    OrganisationPreviousNameRepository organisationPreviousNameRepository;
+    public OrganisationPreviousNameRepository organisationPreviousNameRepository;
 
     public static class CocCodeType {
 

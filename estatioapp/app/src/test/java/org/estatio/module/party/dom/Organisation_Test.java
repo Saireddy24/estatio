@@ -20,6 +20,7 @@ package org.estatio.module.party.dom;
 
 import java.util.TreeSet;
 
+import org.assertj.core.api.Assertions;
 import org.jmock.auto.Mock;
 import org.joda.time.LocalDate;
 import org.junit.Before;
@@ -109,5 +110,25 @@ public class Organisation_Test {
 
             assertThat(previousNames.first().getName()).isEqualToIgnoringCase("Alpha");
         }
+    }
+
+    @Test
+    public void setChamberOfCommerceCodeIfNotAlready_works() throws Exception {
+
+        // given
+        final String chamberOfCommerceCode = "some code 123";
+        Organisation organisation = new Organisation();
+
+        // when
+        organisation.setChamberOfCommerceCodeIfNotAlready(chamberOfCommerceCode);
+        // then
+        Assertions.assertThat(organisation.getChamberOfCommerceCode()).isEqualTo(chamberOfCommerceCode);
+
+        // and when
+        organisation.setChamberOfCommerceCodeIfNotAlready("some other code 456");
+        // then still
+        Assertions.assertThat(organisation.getChamberOfCommerceCode()).isEqualTo(chamberOfCommerceCode);
+
+
     }
 }
