@@ -7,6 +7,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.SortedSet;
 import java.util.TreeSet;
+import java.util.concurrent.TimeUnit;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
@@ -398,13 +399,15 @@ public class Order extends UdoDomainObject2<Order> implements Stateful {
     @Action(
             semantics = SemanticsOf.IDEMPOTENT
     )
+    @ActionLayout(named = "Create Supplier")
     public Order createSeller(
-            final String name,
+            final OrganisationNameNumberViewModel candidate,
             final Country country,
             @Nullable
             final String ibanNumber) {
         Organisation organisation = organisationRepository
-                .newOrganisation(null, true, name, country);
+                .newOrganisation(null, true, candidate.getOrganisationName(), country);
+        if (candidate.getChamberOfCommerceCode()!=null) organisation.setChamberOfCommerceCode(candidate.getChamberOfCommerceCode());
         setSeller(organisation);
         if (ibanNumber != null) {
             bankAccountRepository.newBankAccount(organisation, ibanNumber, null);
@@ -413,8 +416,21 @@ public class Order extends UdoDomainObject2<Order> implements Stateful {
         return this;
     }
 
+    public List<OrganisationNameNumberViewModel> autoComplete0CreateSeller(@MinLength(3) final String search){
+        // TODO: take atPath from country - but how?
+        String atPath = "/FRA";
+        try {
+            TimeUnit.SECONDS.sleep(1);
+        } catch (InterruptedException e) {
+            // nothing
+        }
+        List<OrganisationNameNumberViewModel> result =  chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByOrganisation(search, atPath);
+        result.add(new OrganisationNameNumberViewModel(search, null));
+        return result;
+    }
+
     public String validateCreateSeller(
-            final String name,
+            final OrganisationNameNumberViewModel candidate,
             final Country country,
             final String ibanNumber){
         if (ibanNumber != null && !IBANValidator.valid(ibanNumber)){
