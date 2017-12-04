@@ -211,6 +211,10 @@ public abstract class IncomingDocViewModel<T> implements HintStore.HintIdProvide
         }
     }
 
+    public Supplier default0EditSeller(){
+        return new Supplier((Organisation) getSeller());
+    }
+
     protected void onEditSeller(final Party seller){
     }
 
