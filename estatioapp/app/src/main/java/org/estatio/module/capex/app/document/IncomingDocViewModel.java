@@ -14,6 +14,8 @@ import javax.xml.bind.annotation.XmlAccessorType;
 import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlTransient;
 
+import com.google.common.base.Strings;
+
 import org.joda.time.DateTime;
 import org.joda.time.LocalDate;
 import org.wicketstuff.pdfjs.Scale;
@@ -188,7 +190,7 @@ public abstract class IncomingDocViewModel<T> implements HintStore.HintIdProvide
         Organisation organisation = supplier.getOrganisation();
         if (checkSupplier!=null && checkSupplier.getChamberOfCommerceCode()!=null){
             //TODO: factor out setChamberOfCommerceCodeIfNotAlready();
-            if (organisation.getChamberOfCommerceCode()!=null)  organisation.setChamberOfCommerceCode(checkSupplier.getChamberOfCommerceCode());
+            if (Strings.isNullOrEmpty(organisation.getChamberOfCommerceCode()))  organisation.setChamberOfCommerceCode(checkSupplier.getChamberOfCommerceCode());
         }
         if (checkSupplier!=null && checkSupplier.getOrganisationName()!=null && !checkSupplier.getOrganisationName().equals(organisation.getName())){
             organisation.setName(checkSupplier.getOrganisationName());
