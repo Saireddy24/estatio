@@ -377,7 +377,7 @@ public class Order extends UdoDomainObject2<Order> implements Stateful {
         return partyRepository.autoCompleteSupplier(search);
     }
     public List<OrganisationNameNumberViewModel> choices1EditSeller(final Supplier supplier){
-        if (supplier==null) return null;
+        if (supplier==null || supplier.getOrganisation()==null) return null;
         if (supplier.getOrganisation().getChamberOfCommerceCode()==null) {
             return chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByOrganisation(supplier.getOrganisation());
         } else {
