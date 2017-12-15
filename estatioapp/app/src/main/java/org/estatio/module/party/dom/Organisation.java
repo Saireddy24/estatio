@@ -115,6 +115,9 @@ public class Organisation
             final @Parameter(optionality = Optionality.OPTIONAL, regexPattern = ReferenceType.Meta.REGEX, regexPatternReplacement = ReferenceType.Meta.REGEX_DESCRIPTION) String chamberOfCommerceCode) {
         setVatCode(vatCode);
         setFiscalCode(fiscalCode);
+        if (getChamberOfCommerceCode()!=null && !getChamberOfCommerceCode().equals(chamberOfCommerceCode)){
+            setVerified(false);
+        }
         setChamberOfCommerceCode(chamberOfCommerceCode);
         return this;
     }
@@ -137,6 +140,7 @@ public class Organisation
         if (!name.equals(getName())) {
             OrganisationPreviousName organisationPreviousName = organisationPreviousNameRepository.newOrganisationPreviousName(getName(), previousNameEndDate);
             getPreviousNames().add(organisationPreviousName);
+            setVerified(false);
         }
 
         setName(name);
@@ -166,7 +170,13 @@ public class Organisation
             final boolean applyCheckedSupplierDetails
     ){
         if (applyCheckedSupplierDetails && organisationCheck!=null) {
-            organisationCheck.applyChamberOfCommerceCodeAndNameTo(this);
+            if (!Strings.isNullOrEmpty(organisationCheck.getChamberOfCommerceCode())) {
+                setChamberOfCommerceCodeIfNotAlready(organisationCheck.getChamberOfCommerceCode());
+            }
+            if (!Strings.isNullOrEmpty(organisationCheck.getOrganisationName()) && !organisationCheck.getOrganisationName().equals(getName())) {
+                changeName(organisationCheck.getOrganisationName(), clockService.now());
+            }
+            setVerified(true);
         }
         return this;
     }

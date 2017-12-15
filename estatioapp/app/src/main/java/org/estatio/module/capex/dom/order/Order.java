@@ -1,7 +1,6 @@
 package org.estatio.module.capex.dom.order;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -345,30 +344,21 @@ public class Order extends UdoDomainObject2<Order> implements Stateful {
     @ActionLayout(named = "Edit Supplier")
     public Order editSeller(
             @Nullable
-            final Supplier supplier,
-            @Nullable
-            final OrganisationNameNumberViewModel supplierCheck,
-            final boolean applyCheckedSupplierDetails,
+            final Party supplier,
             final boolean createRoleIfRequired){
-        Organisation organisation = supplier.getOrganisation();
-        if (applyCheckedSupplierDetails && supplierCheck!=null) {
-            supplierCheck.applyChamberOfCommerceCodeAndNameTo(organisation);
-        }
-        setSeller(supplier.getOrganisation());
+        setSeller(supplier);
         if(supplier != null && createRoleIfRequired) {
-            partyRoleRepository.findOrCreate(supplier.getOrganisation(), IncomingInvoiceRoleTypeEnum.SUPPLIER);
+            partyRoleRepository.findOrCreate(supplier, IncomingInvoiceRoleTypeEnum.SUPPLIER);
         }
         return this;
     }
 
     public String validateEditSeller(
-            final Supplier supplier,
-            final OrganisationNameNumberViewModel supplierCheck,
-            final boolean applyCheckedSupplierDetails,
+            final Party supplier,
             final boolean createRoleIfRequired){
         if(supplier != null && !createRoleIfRequired) {
             // requires that the supplier already has this role
-            return partyRoleRepository.validateThat(supplier.getOrganisation(), IncomingInvoiceRoleTypeEnum.SUPPLIER);
+            return partyRoleRepository.validateThat(supplier, IncomingInvoiceRoleTypeEnum.SUPPLIER);
         }
         return null;
     }
@@ -376,17 +366,9 @@ public class Order extends UdoDomainObject2<Order> implements Stateful {
     public List<Supplier> autoComplete0EditSeller(final String search){
         return partyRepository.autoCompleteSupplier(search);
     }
-    public List<OrganisationNameNumberViewModel> choices1EditSeller(final Supplier supplier){
-        if (supplier==null || supplier.getOrganisation()==null) return null;
-        if (supplier.getOrganisation().getChamberOfCommerceCode()==null) {
-            return chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByOrganisation(supplier.getOrganisation());
-        } else {
-            return Arrays.asList(chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByCode(supplier.getOrganisation()));
-        }
-    }
 
-    public Supplier default0EditSeller(){
-        return new Supplier((Organisation) getSeller());
+    public Party default0EditSeller(){
+        return getSeller();
     }
 
     public String disableEditSeller(){

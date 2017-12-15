@@ -72,7 +72,6 @@ import org.estatio.module.party.dom.Organisation;
 import org.estatio.module.party.dom.OrganisationRepository;
 import org.estatio.module.party.dom.Party;
 import org.estatio.module.party.dom.PartyRepository;
-import org.estatio.module.party.dom.Supplier;
 import org.estatio.module.party.dom.role.PartyRoleRepository;
 import org.estatio.module.tax.dom.Tax;
 
@@ -181,48 +180,26 @@ public abstract class IncomingDocViewModel<T> implements HintStore.HintIdProvide
     // use of modify so can be overridden on IncomingInvoiceViewmodel
 
     @ActionLayout(named = "Edit Supplier")
-    public IncomingDocViewModel editSeller(
-            final Supplier supplier,
-            @Nullable
-            final OrganisationNameNumberViewModel supplierCheck,
-            final boolean applyCheckedSupplierDetails,
-            final boolean createRoleIfRequired) {
-        Organisation organisation = supplier.getOrganisation();
-        if (applyCheckedSupplierDetails && supplierCheck!=null) {
-            supplierCheck.applyChamberOfCommerceCodeAndNameTo(organisation);
-        }
-        setSeller(organisation);
+    public IncomingDocViewModel editSeller(final Party supplier, final boolean createRoleIfRequired) {
+        setSeller(supplier);
         if(createRoleIfRequired) {
-            partyRoleRepository.findOrCreate(supplier.getOrganisation(), IncomingInvoiceRoleTypeEnum.SUPPLIER);
+            partyRoleRepository.findOrCreate(supplier, IncomingInvoiceRoleTypeEnum.SUPPLIER);
         }
-        onEditSeller(supplier.getOrganisation());
+        onEditSeller(supplier);
         return this;
     }
 
-    public List<Supplier> autoComplete0EditSeller(final String search){
-        return partyRepository.autoCompleteSupplier(search);
-    }
-
-    public List<OrganisationNameNumberViewModel> choices1EditSeller(final Supplier supplier){
-        if (supplier==null || supplier.getOrganisation()==null) return null;
-        if (supplier.getOrganisation().getChamberOfCommerceCode()==null) {
-            return chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByOrganisation(supplier.getOrganisation());
-        } else {
-            return Arrays.asList(chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByCode(supplier.getOrganisation()));
-        }
-    }
-
-    public Supplier default0EditSeller(){
-        return new Supplier((Organisation) getSeller());
+    public Party default0EditSeller(){
+        return getSeller();
     }
 
     protected void onEditSeller(final Party seller){
     }
 
-    public String validateEditSeller(final Supplier supplier, final OrganisationNameNumberViewModel candidate, final boolean applyCheckedSupplierDetails, final boolean createRoleIfRequired){
+    public String validateEditSeller(final Party supplier, final boolean createRoleIfRequired){
         if(!createRoleIfRequired) {
             // requires that the supplier already has this role
-            return partyRoleRepository.validateThat(supplier.getOrganisation(), IncomingInvoiceRoleTypeEnum.SUPPLIER);
+            return partyRoleRepository.validateThat(supplier, IncomingInvoiceRoleTypeEnum.SUPPLIER);
         }
         return null;
     }

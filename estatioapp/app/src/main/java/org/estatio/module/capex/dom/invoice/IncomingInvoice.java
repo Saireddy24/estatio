@@ -1,7 +1,6 @@
 package org.estatio.module.capex.dom.invoice;
 
 import java.math.BigDecimal;
-import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
@@ -81,11 +80,8 @@ import org.estatio.module.invoice.dom.InvoiceItem;
 import org.estatio.module.invoice.dom.InvoiceStatus;
 import org.estatio.module.invoice.dom.PaymentMethod;
 import org.estatio.module.party.app.services.ChamberOfCommerceCodeLookUpService;
-import org.estatio.module.party.app.services.OrganisationNameNumberViewModel;
-import org.estatio.module.party.dom.Organisation;
 import org.estatio.module.party.dom.Party;
 import org.estatio.module.party.dom.PartyRepository;
-import org.estatio.module.party.dom.Supplier;
 import org.estatio.module.party.dom.role.PartyRoleRepository;
 import org.estatio.module.tax.dom.Tax;
 
@@ -1038,47 +1034,28 @@ public class IncomingInvoice extends Invoice<IncomingInvoice> implements SellerB
     @ActionLayout(named = "Edit Supplier")
     public IncomingInvoice editSeller(
             @Nullable
-            final Supplier supplier,
-            @Nullable
-            final OrganisationNameNumberViewModel supplierCheck,
-            final boolean applyCheckedSupplierDetails,
+            final Party supplier,
             final boolean createRoleIfRequired){
-        Organisation organisation = supplier.getOrganisation();
-        if (applyCheckedSupplierDetails && supplierCheck!=null) {
-            supplierCheck.applyChamberOfCommerceCodeAndNameTo(organisation);
-        }
-        setSeller(supplier.getOrganisation());
-        setBankAccount(bankAccountRepository.getFirstBankAccountOfPartyOrNull(supplier.getOrganisation()));
+        setSeller(supplier);
+        setBankAccount(bankAccountRepository.getFirstBankAccountOfPartyOrNull(supplier));
         if(supplier != null && createRoleIfRequired) {
-            partyRoleRepository.findOrCreate(supplier.getOrganisation(), IncomingInvoiceRoleTypeEnum.SUPPLIER);
+            partyRoleRepository.findOrCreate(supplier, IncomingInvoiceRoleTypeEnum.SUPPLIER);
         }
         return this;
     }
-    public List<Supplier> autoComplete0EditSeller(final String search){
-        return partyRepository.autoCompleteSupplier(search);
-    }
-    public List<OrganisationNameNumberViewModel> choices1EditSeller(final Supplier supplier){
-        if (supplier==null || supplier.getOrganisation()==null) return null;
-        if (supplier.getOrganisation().getChamberOfCommerceCode()==null) {
-            return chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByOrganisation(supplier.getOrganisation());
-        } else {
-            return Arrays.asList(chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByCode(supplier.getOrganisation()));
-        }
-    }
     public String validateEditSeller(
-            final Supplier supplier,
-            final OrganisationNameNumberViewModel supplierCheck,
-            final boolean applyCheckedSupplierDetails,
+            final Party supplier,
             final boolean createRoleIfRequired){
         if(supplier != null && !createRoleIfRequired) {
             // requires that the supplier already has this role
-            return partyRoleRepository.validateThat(supplier.getOrganisation(), IncomingInvoiceRoleTypeEnum.SUPPLIER);
+            return partyRoleRepository.validateThat(supplier, IncomingInvoiceRoleTypeEnum.SUPPLIER);
         }
         return null;
     }
-    public Supplier default0EditSeller(){
-        return new Supplier((Organisation) getSeller());
+    public Party default0EditSeller(){
+        return getSeller();
     }
+
     public String disableEditSeller(){
 
         final ReasonBuffer2 buf = ReasonBuffer2.forSingle("Cannot edit seller because");
