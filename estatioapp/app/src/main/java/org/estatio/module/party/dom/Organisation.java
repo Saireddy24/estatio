@@ -18,9 +18,12 @@
  */
 package org.estatio.module.party.dom;
 
+import java.util.Arrays;
+import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
+import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.Persistent;
@@ -44,6 +47,8 @@ import org.incode.module.base.dom.types.ReferenceType;
 
 import org.estatio.module.base.dom.apptenancy.WithApplicationTenancyCountry;
 import org.estatio.module.base.dom.apptenancy.WithApplicationTenancyPathPersisted;
+import org.estatio.module.party.app.services.ChamberOfCommerceCodeLookUpService;
+import org.estatio.module.party.app.services.OrganisationNameNumberViewModel;
 
 import lombok.Getter;
 import lombok.Setter;
@@ -84,11 +89,16 @@ public class Organisation
 
     // //////////////////////////////////////
 
-
     @javax.jdo.annotations.Column(length = CocCodeType.Meta.MAX_LEN)
     @Property(optionality = Optionality.OPTIONAL)
     @Getter @Setter
     private String chamberOfCommerceCode;
+
+    // //////////////////////////////////////
+
+    @Property(optionality = Optionality.OPTIONAL)
+    @Getter @Setter
+    private Boolean verified;
 
     // //////////////////////////////////////
 
@@ -150,6 +160,25 @@ public class Organisation
         return previousNameEndDate.isAfter(getClockService().now()) ? "You can not select a future end date" : null;
     }
 
+    public Organisation verify(
+            @Nullable
+            final OrganisationNameNumberViewModel organisationCheck,
+            final boolean applyCheckedSupplierDetails
+    ){
+        if (applyCheckedSupplierDetails && organisationCheck!=null) {
+            organisationCheck.applyChamberOfCommerceCodeAndNameTo(this);
+        }
+        return this;
+    }
+
+    public List<OrganisationNameNumberViewModel> choices0Verify(){
+        if (getChamberOfCommerceCode()==null) {
+            return chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByOrganisation(this);
+        } else {
+            return Arrays.asList(chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByCode(this));
+        }
+    }
+
     @Programmatic
     public void setChamberOfCommerceCodeIfNotAlready(final String chamberOfCommerceCode) {
         if (Strings.isNullOrEmpty(getChamberOfCommerceCode()))
@@ -159,6 +188,9 @@ public class Organisation
 
     @Inject
     public OrganisationPreviousNameRepository organisationPreviousNameRepository;
+
+    @Inject
+    ChamberOfCommerceCodeLookUpService chamberOfCommerceCodeLookUpService;
 
     public static class CocCodeType {
 
