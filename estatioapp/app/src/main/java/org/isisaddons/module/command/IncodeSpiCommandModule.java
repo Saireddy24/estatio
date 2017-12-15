@@ -26,7 +26,7 @@ import com.google.common.collect.Sets;
 
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 
-import org.isisaddons.module.base.platform.applib.ModuleAbstract;
+import org.apache.isis.applib.ModuleAbstract;
 
 import org.incode.module.fixturesupport.dom.scripts.TeardownFixtureAbstract;
 
@@ -37,7 +37,7 @@ import org.incode.module.fixturesupport.dom.scripts.TeardownFixtureAbstract;
 public final class IncodeSpiCommandModule extends ModuleAbstract {
 
     @Override
-    public Set<Class<?>> getDependenciesAsClass() {
+    public Set<Class<?>> getAdditionalModules() {
         return Sets.newHashSet(CommandModule.class);
     }
 

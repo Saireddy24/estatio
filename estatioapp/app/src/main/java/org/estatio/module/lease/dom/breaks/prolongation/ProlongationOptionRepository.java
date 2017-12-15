@@ -19,6 +19,10 @@
 
 package org.estatio.module.lease.dom.breaks.prolongation;
 
+import java.util.List;
+
+import javax.inject.Inject;
+
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 import org.apache.isis.applib.annotation.Programmatic;
@@ -28,6 +32,7 @@ import org.incode.module.base.dom.utils.JodaPeriodUtils;
 import org.estatio.module.base.dom.UdoDomainRepositoryAndFactory;
 import org.estatio.module.lease.dom.Lease;
 import org.estatio.module.lease.dom.breaks.BreakExerciseType;
+import org.estatio.module.lease.dom.breaks.BreakOptionRepository;
 import org.estatio.module.lease.dom.breaks.BreakType;
 
 @DomainService(nature = NatureOfService.DOMAIN, repositoryFor = ProlongationOption.class)
@@ -38,30 +43,29 @@ public class ProlongationOptionRepository extends UdoDomainRepositoryAndFactory<
     }
 
     @Programmatic
-    public Lease newProlongationOption(
+    public ProlongationOption newProlongationOption(
             final Lease lease,
             final String prolongationPeriod,
             final String notificationPeriod,
             final String description
     ) {
-        if (findByLease(lease) == null) {
-            final ProlongationOption prolongationOption = newTransientInstance();
-            prolongationOption.setType(BreakType.PROLONGATION);
-            prolongationOption.setLease(lease);
-            prolongationOption.setExerciseType(BreakExerciseType.TENANT);
-            prolongationOption.setBreakDate(lease.getEndDate());
-            prolongationOption.setProlongationPeriod(prolongationPeriod);
-            prolongationOption.setNotificationPeriod(notificationPeriod);
-            if (notificationPeriod != null) {
-                prolongationOption.setExerciseDate(lease.getEndDate().minus(JodaPeriodUtils.asPeriod(notificationPeriod)));
-            } else
-            {
-                prolongationOption.setExerciseDate(lease.getEndDate());
-            }
-            prolongationOption.setDescription(description);
-            persist(prolongationOption);
+        final ProlongationOption prolongationOption = newTransientInstance();
+        prolongationOption.setType(BreakType.PROLONGATION);
+        prolongationOption.setLease(lease);
+        prolongationOption.setExerciseType(BreakExerciseType.TENANT);
+        prolongationOption.setBreakDate(lease.getEndDate());
+        prolongationOption.setProlongationPeriod(prolongationPeriod);
+        prolongationOption.setNotificationPeriod(notificationPeriod);
+        if (notificationPeriod != null) {
+            prolongationOption.setExerciseDate(lease.getEndDate().minus(JodaPeriodUtils.asPeriod(notificationPeriod)));
+        } else
+        {
+            prolongationOption.setExerciseDate(lease.getEndDate());
         }
-        return lease;
+        prolongationOption.setDescription(description);
+        persist(prolongationOption);
+
+        return prolongationOption;
     }
 
     @Programmatic
@@ -71,15 +75,18 @@ public class ProlongationOptionRepository extends UdoDomainRepositoryAndFactory<
             final String notificationPeriod,
             final String description
     ){
-        return findByLease(lease) == null ? null : "A pronlongation option for this lease already exists";
+        return breakOptionRepository.checkNewBreakOptionDuplicate(lease, BreakType.PROLONGATION, lease.getEndDate());
     }
 
     @Programmatic
-    public ProlongationOption findByLease(
+    public List<ProlongationOption> findByLease(
             final Lease lease) {
-        return uniqueMatch("findByLease",
+        return allMatches("findByLease",
                 "lease", lease
         );
     }
+
+    @Inject
+    BreakOptionRepository breakOptionRepository;
 
 }

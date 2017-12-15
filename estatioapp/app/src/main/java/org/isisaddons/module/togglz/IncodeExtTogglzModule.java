@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.collect.Sets;
 
-import org.isisaddons.module.base.platform.applib.ModuleAbstract;
+import org.apache.isis.applib.ModuleAbstract;
 
 /**
  * This is a "proxy" for the corresponding module defined in the Incode Platform.
@@ -33,7 +33,7 @@ import org.isisaddons.module.base.platform.applib.ModuleAbstract;
 public final class IncodeExtTogglzModule extends ModuleAbstract {
 
     @Override
-    public Set<Class<?>> getDependenciesAsClass() {
+    public Set<Class<?>> getAdditionalModules() {
         return Sets.newHashSet(
                 TogglzModule.class
         );

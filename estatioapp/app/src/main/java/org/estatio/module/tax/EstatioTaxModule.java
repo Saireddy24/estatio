@@ -26,13 +26,14 @@ import com.google.common.collect.Sets;
 
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 
-import org.isisaddons.module.base.platform.applib.Module;
-import org.isisaddons.module.base.platform.applib.ModuleAbstract;
-import org.isisaddons.module.base.platform.fixturesupport.DataEnumPersist;
+import org.apache.isis.applib.Module;
+import org.apache.isis.applib.ModuleAbstract;
+import org.apache.isis.applib.fixturescripts.setup.PersonaEnumPersistAll;
 
 import org.incode.module.fixturesupport.dom.scripts.TeardownFixtureAbstract;
 
 import org.estatio.module.base.EstatioBaseModule;
+import org.estatio.module.country.IncodeDomCountryModule;
 import org.estatio.module.tax.dom.Tax;
 import org.estatio.module.tax.dom.TaxRate;
 import org.estatio.module.tax.fixtures.builders.TaxBuilder;
@@ -45,7 +46,7 @@ public final class EstatioTaxModule extends ModuleAbstract {
 
     @Override
     public Set<Module> getDependencies() {
-        return Sets.newHashSet(new EstatioBaseModule());
+        return Sets.newHashSet(new EstatioBaseModule(), new IncodeDomCountryModule());
     }
 
     private static final ThreadLocal<Boolean> refData = ThreadLocal.withInitial(() -> false);
@@ -56,7 +57,7 @@ public final class EstatioTaxModule extends ModuleAbstract {
         }
         // else
         refData.set(true);
-        return new DataEnumPersist<Tax_enum, Tax, TaxBuilder>(Tax_enum.class) {};
+        return new PersonaEnumPersistAll<Tax_enum, Tax, TaxBuilder>(Tax_enum.class) {};
     }
 
     @Override

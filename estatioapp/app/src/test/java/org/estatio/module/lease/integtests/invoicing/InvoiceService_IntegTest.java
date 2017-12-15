@@ -53,20 +53,16 @@ import org.estatio.module.lease.dom.invoicing.InvoiceForLease;
 import org.estatio.module.lease.dom.invoicing.InvoiceForLeaseRepository;
 import org.estatio.module.lease.dom.invoicing.InvoiceItemForLease;
 import org.estatio.module.lease.dom.invoicing.InvoiceItemForLeaseRepository;
-import org.estatio.module.lease.fixtures.breakoptions.personas.LeaseBreakOptionsForOxfMediax002Gb;
-import org.estatio.module.lease.fixtures.breakoptions.personas.LeaseBreakOptionsForOxfPoison003Gb;
-import org.estatio.module.lease.fixtures.breakoptions.personas.LeaseBreakOptionsForOxfTopModel001;
-import org.estatio.module.lease.fixtures.invoicing.personas.InvoiceForLeaseItemTypeOfRentOneQuarterForKalPoison001;
-import org.estatio.module.lease.fixtures.invoicing.personas.InvoiceForLeaseItemTypeOfRentOneQuarterForOxfPoison003;
+import org.estatio.module.lease.fixtures.breakoptions.enums.BreakOption_enum;
+import org.estatio.module.lease.fixtures.invoice.enums.InvoiceForLease_enum;
 import org.estatio.module.lease.fixtures.lease.enums.Lease_enum;
-import org.estatio.module.lease.fixtures.leaseitems.deposits.personas.LeaseItemAndLeaseTermForDepositForOxfMiracl005Gb;
-import org.estatio.module.lease.fixtures.leaseitems.discount.personas.LeaseItemAndLeaseTermForDiscountForOxfMiracl005Gb;
-import org.estatio.module.lease.fixtures.leaseitems.percentage.personas.LeaseItemAndLeaseTermForPercentageForOxfMiracl005Gb;
-import org.estatio.module.lease.fixtures.leaseitems.rent.personas.LeaseItemAndLeaseTermForRentOf2ForOxfMiracl005Gb;
-import org.estatio.module.lease.fixtures.leaseitems.servicecharge.personas.LeaseItemAndLeaseTermForServiceChargeOf2ForOxfMiracl005Gb;
-import org.estatio.module.lease.fixtures.leaseitems.turnoverrent.personas.LeaseItemAndLeaseTermForTurnoverRentForOxfMiracl005Gb;
+import org.estatio.module.lease.fixtures.leaseitems.enums.LeaseItemForDeposit_enum;
+import org.estatio.module.lease.fixtures.leaseitems.enums.LeaseItemForDiscount_enum;
+import org.estatio.module.lease.fixtures.leaseitems.enums.LeaseItemForPercentage_enum;
+import org.estatio.module.lease.fixtures.leaseitems.enums.LeaseItemForRent_enum;
+import org.estatio.module.lease.fixtures.leaseitems.enums.LeaseItemForServiceCharge_enum;
+import org.estatio.module.lease.fixtures.leaseitems.enums.LeaseItemForTurnoverRent_enum;
 import org.estatio.module.lease.integtests.LeaseModuleIntegTestAbstract;
-import org.estatio.module.lease.migrations.CreateInvoiceNumerators;
 
 import static org.hamcrest.CoreMatchers.is;
 import static org.junit.Assert.assertNotNull;
@@ -116,25 +112,34 @@ public class InvoiceService_IntegTest extends LeaseModuleIntegTestAbstract {
         public void setupTransactionalData() {
             runFixtureScript(new FixtureScript() {
                 @Override
-                protected void execute(final ExecutionContext executionContext) {
-                    executionContext.executeChild(this, Person_enum.JohnDoeNl.builder());
-                    executionContext.executeChild(this, PropertyAndUnitsAndOwnerAndManager_enum.OxfGb.builder());
-                    executionContext.executeChild(this, PropertyAndUnitsAndOwnerAndManager_enum.KalNl.builder());
-                    executionContext.executeChild(this, new LeaseBreakOptionsForOxfTopModel001());
-                    executionContext.executeChild(this, new LeaseBreakOptionsForOxfMediax002Gb());
-                    executionContext.executeChild(this, new LeaseBreakOptionsForOxfPoison003Gb());
-                    executionContext.executeChild(this, new InvoiceForLeaseItemTypeOfRentOneQuarterForOxfPoison003());
-                    executionContext.executeChild(this, new InvoiceForLeaseItemTypeOfRentOneQuarterForKalPoison001());
-                    executionContext.executeChild(this, Lease_enum.OxfPret004Gb.builder());
+                protected void execute(final ExecutionContext ec) {
 
-                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForRentOf2ForOxfMiracl005Gb());
-                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForServiceChargeOf2ForOxfMiracl005Gb());
-                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForTurnoverRentForOxfMiracl005Gb());
-                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForDiscountForOxfMiracl005Gb());
-                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForPercentageForOxfMiracl005Gb());
-                    executionContext.executeChild(this, new LeaseItemAndLeaseTermForDepositForOxfMiracl005Gb());
+                    ec.executeChildren(this,
+                            Person_enum.JohnDoeNl,
+                            PropertyAndUnitsAndOwnerAndManager_enum.OxfGb,
+                            PropertyAndUnitsAndOwnerAndManager_enum.KalNl);
 
-                    executionContext.executeChild(this, new CreateInvoiceNumerators());
+                    ec.executeChildren(this,
+                            BreakOption_enum.OxfPoison003Gb_FIXED,
+                            BreakOption_enum.OxfPoison003Gb_ROLLING,
+                            BreakOption_enum.OxfPoison003Gb_FIXED,
+                            BreakOption_enum.OxfPoison003Gb_ROLLING,
+                            BreakOption_enum.OxfTopModel001Gb_FIXED,
+                            BreakOption_enum.OxfTopModel001Gb_ROLLING);
+
+                    ec.executeChildren(this,
+                            InvoiceForLease_enum.OxfPoison003Gb,
+                            InvoiceForLease_enum.KalPoison001Nl);
+
+                    ec.executeChildren(this,
+                            Lease_enum.OxfPret004Gb,
+
+                            LeaseItemForRent_enum.OxfMiracl005Gb,
+                            LeaseItemForServiceCharge_enum.OxfMiracl005Gb,
+                            LeaseItemForTurnoverRent_enum.OxfMiracl005Gb,
+                            LeaseItemForDiscount_enum.OxfMiracle005bGb,
+                            LeaseItemForPercentage_enum.OxfMiracl005Gb,
+                            LeaseItemForDeposit_enum.OxfMiracle005bGb);
                 }
             });
 

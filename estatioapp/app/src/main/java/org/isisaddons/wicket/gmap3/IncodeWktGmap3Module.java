@@ -28,7 +28,7 @@ import org.isisaddons.wicket.gmap3.cpt.applib.Gmap3ApplibModule;
 import org.isisaddons.wicket.gmap3.cpt.service.Gmap3ServiceModule;
 import org.isisaddons.wicket.gmap3.cpt.ui.Gmap3UiModule;
 
-import org.isisaddons.module.base.platform.applib.ModuleAbstract;
+import org.apache.isis.applib.ModuleAbstract;
 
 /**
  * This is a "proxy" for the corresponding module defined in the Incode Platform.
@@ -37,7 +37,7 @@ import org.isisaddons.module.base.platform.applib.ModuleAbstract;
 public final class IncodeWktGmap3Module extends ModuleAbstract {
 
     @Override
-    public Set<Class<?>> getDependenciesAsClass() {
+    public Set<Class<?>> getAdditionalModules() {
         return Sets.newHashSet(
                 Gmap3ApplibModule.class,
                 Gmap3UiModule.class,

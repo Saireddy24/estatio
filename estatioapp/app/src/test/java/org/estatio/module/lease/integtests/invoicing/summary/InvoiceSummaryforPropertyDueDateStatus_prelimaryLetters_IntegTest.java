@@ -42,6 +42,7 @@ import org.incode.module.document.dom.impl.paperclips.PaperclipRepository;
 import org.incode.module.document.dom.impl.types.DocumentType;
 import org.incode.module.document.dom.impl.types.DocumentTypeRepository;
 
+import org.estatio.module.base.platform.integtestsupport.RunBackgroundCommandsService;
 import org.estatio.module.invoice.dom.DocumentTypeData;
 import org.estatio.module.invoice.dom.Invoice;
 import org.estatio.module.invoice.dom.InvoiceStatus;
@@ -55,7 +56,7 @@ import org.estatio.module.lease.dom.invoicing.summary.comms.DocAndCommForPrelimL
 import org.estatio.module.lease.dom.invoicing.summary.comms.InvoiceSummaryForPropertyDueDateStatus_backgroundPreparePreliminaryLetters;
 import org.estatio.module.lease.dom.invoicing.summary.comms.InvoiceSummaryForPropertyDueDateStatus_preliminaryLetters;
 import org.estatio.module.lease.dom.invoicing.summary.comms.InvoiceSummaryForPropertyDueDateStatus_sendByEmailPreliminaryLetters;
-import org.estatio.module.lease.fixtures.invoicing.personas.InvoiceForLeaseItemTypeOfRentOneQuarterForOxfPoison003;
+import org.estatio.module.lease.fixtures.invoice.enums.InvoiceForLease_enum;
 import org.estatio.module.lease.integtests.LeaseModuleIntegTestAbstract;
 import org.estatio.module.lease.seed.DocumentTypesAndTemplatesForLeaseFixture;
 
@@ -70,10 +71,11 @@ public class InvoiceSummaryforPropertyDueDateStatus_prelimaryLetters_IntegTest e
         public void setupData() {
             runFixtureScript(new FixtureScript() {
                 @Override
-                protected void execute(ExecutionContext executionContext) {
-                    executionContext.executeChild(this, new InvoiceForLeaseItemTypeOfRentOneQuarterForOxfPoison003());
+                protected void execute(ExecutionContext ec) {
+                    ec.executeChildren(this,
+                            InvoiceForLease_enum.OxfPoison003Gb);
 
-                    executionContext.executeChild(this, new DocumentTypesAndTemplatesForLeaseFixture());
+                    ec.executeChild(this, new DocumentTypesAndTemplatesForLeaseFixture());
                 }
             });
         }
@@ -224,4 +226,7 @@ public class InvoiceSummaryforPropertyDueDateStatus_prelimaryLetters_IntegTest e
     PaperclipRepository paperclipRepository;
     @Inject
     DocumentTypeRepository documentTypeRepository;
+
+    @Inject
+    protected RunBackgroundCommandsService runBackgroundCommandsService;
 }

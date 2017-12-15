@@ -26,7 +26,7 @@ import com.google.common.collect.Sets;
 
 import org.apache.isis.applib.fixturescripts.FixtureScript;
 
-import org.isisaddons.module.base.platform.applib.ModuleAbstract;
+import org.apache.isis.applib.ModuleAbstract;
 import org.isisaddons.module.publishmq.dom.jdo.events.PublishedEvent;
 import org.isisaddons.module.publishmq.dom.jdo.status.StatusMessage;
 
@@ -39,7 +39,7 @@ import org.incode.module.fixturesupport.dom.scripts.TeardownFixtureAbstract;
 public final class IncodeSpiPublishMqModule extends ModuleAbstract {
 
     @Override
-    public Set<Class<?>> getDependenciesAsClass() {
+    public Set<Class<?>> getAdditionalModules() {
         return Sets.newHashSet(org.isisaddons.module.publishmq.PublishMqModule.class);
     }
 

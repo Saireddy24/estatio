@@ -26,7 +26,7 @@ import com.google.common.collect.Sets;
 
 import org.isisaddons.module.freemarker.dom.FreeMarkerModule;
 
-import org.isisaddons.module.base.platform.applib.ModuleAbstract;
+import org.apache.isis.applib.ModuleAbstract;
 
 /**
  * This is a "proxy" for the corresponding module defined in the Incode Platform.
@@ -36,7 +36,7 @@ public final class IncodeLibFreeMarkerModule extends ModuleAbstract {
 
 
     @Override
-    public Set<Class<?>> getDependenciesAsClass() {
+    public Set<Class<?>> getAdditionalModules() {
         return Sets.newHashSet(FreeMarkerModule.class);
     }
 

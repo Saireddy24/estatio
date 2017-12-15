@@ -24,7 +24,7 @@ import javax.xml.bind.annotation.XmlRootElement;
 
 import com.google.common.collect.Sets;
 
-import org.isisaddons.module.base.platform.applib.ModuleAbstract;
+import org.apache.isis.applib.ModuleAbstract;
 
 import org.incode.module.docfragment.dom.DocFragmentModuleDomModule;
 
@@ -36,7 +36,7 @@ import org.incode.module.docfragment.dom.DocFragmentModuleDomModule;
 public final class IncodeDomDocFragmentModule extends ModuleAbstract {
 
     @Override
-    public Set<Class<?>> getDependenciesAsClass() {
+    public Set<Class<?>> getAdditionalModules() {
         return Sets.newHashSet(DocFragmentModuleDomModule.class);
     }
 
