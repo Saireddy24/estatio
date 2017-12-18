@@ -246,7 +246,7 @@ public class Organisation_Test {
         }});
 
         // when
-        organisation.verify(vm, true);
+        organisation.verify(vm);
 
         // then
         assertThat(organisation.getName()).isEqualTo(looked_up_name);
@@ -280,7 +280,7 @@ public class Organisation_Test {
         }});
 
         // when
-        organisation.verify(vm, true);
+        organisation.verify(vm);
 
         // then
         assertThat(organisation.getName()).isEqualTo(looked_up_name);
@@ -288,26 +288,5 @@ public class Organisation_Test {
         assertThat(organisation.getVerified()).isTrue();
 
     }
-
-    @Test
-    public void verify_does_not_apply_changes_when_checkbox_applyXxx_unchecked() throws Exception {
-
-        // given
-        Organisation organisation = new Organisation();
-
-        final String looked_up_name = "Looked Up Name";
-        final String chamberOfCommerceCode = "123456789";
-        OrganisationNameNumberViewModel vm = new OrganisationNameNumberViewModel(looked_up_name, chamberOfCommerceCode);
-
-        // when
-        organisation.verify(vm, false);
-
-        // then
-        assertThat(organisation.getName()).isNull();
-        assertThat(organisation.getChamberOfCommerceCode()).isNull();
-        assertThat(organisation.getVerified()).isNull();
-
-    }
-
 
 }

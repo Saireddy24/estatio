@@ -33,6 +33,7 @@ import com.google.common.base.Strings;
 
 import org.joda.time.LocalDate;
 
+import org.apache.isis.applib.annotation.Action;
 import org.apache.isis.applib.annotation.CollectionLayout;
 import org.apache.isis.applib.annotation.DomainObject;
 import org.apache.isis.applib.annotation.Editing;
@@ -41,6 +42,7 @@ import org.apache.isis.applib.annotation.Optionality;
 import org.apache.isis.applib.annotation.Parameter;
 import org.apache.isis.applib.annotation.Programmatic;
 import org.apache.isis.applib.annotation.Property;
+import org.apache.isis.applib.annotation.SemanticsOf;
 import org.apache.isis.schema.utils.jaxbadapters.PersistentEntityAdapter;
 
 import org.incode.module.base.dom.types.ReferenceType;
@@ -164,20 +166,19 @@ public class Organisation
         return previousNameEndDate.isAfter(getClockService().now()) ? "You can not select a future end date" : null;
     }
 
+    @Action(semantics = SemanticsOf.IDEMPOTENT_ARE_YOU_SURE)
     public Organisation verify(
-            @Nullable
-            final OrganisationNameNumberViewModel organisationCheck,
-            final boolean applyCheckedSupplierDetails
+            @Nullable final OrganisationNameNumberViewModel organisationCheck
     ){
-        if (applyCheckedSupplierDetails && organisationCheck!=null) {
-            if (!Strings.isNullOrEmpty(organisationCheck.getChamberOfCommerceCode())) {
-                setChamberOfCommerceCodeIfNotAlready(organisationCheck.getChamberOfCommerceCode());
-            }
-            if (!Strings.isNullOrEmpty(organisationCheck.getOrganisationName()) && !organisationCheck.getOrganisationName().equals(getName())) {
-                changeName(organisationCheck.getOrganisationName(), clockService.now());
-            }
-            setVerified(true);
+
+        if (!Strings.isNullOrEmpty(organisationCheck.getChamberOfCommerceCode())) {
+            setChamberOfCommerceCodeIfNotAlready(organisationCheck.getChamberOfCommerceCode());
         }
+        if (!Strings.isNullOrEmpty(organisationCheck.getOrganisationName()) && !organisationCheck.getOrganisationName().equals(getName())) {
+            changeName(organisationCheck.getOrganisationName(), clockService.now());
+        }
+        setVerified(true);
+
         return this;
     }
 
