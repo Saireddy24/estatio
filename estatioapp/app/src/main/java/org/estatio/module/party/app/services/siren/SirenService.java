@@ -33,10 +33,9 @@ import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
-import com.google.gson.JsonPrimitive;
 
-public class Siren {
-    public List<String> getChamberOfCommerceCodes(String query) {
+public class SirenService {
+    public List<SirenResult> getChamberOfCommerceCodes(String query) {
         UriBuilder uriBuilder = UriBuilder
                 .fromUri("https://data.opendatasoft.com")
                 .path("api/records/1.0/search/")
@@ -44,10 +43,11 @@ public class Siren {
                 .queryParam("q", "{query}");
         URI uri = uriBuilder.build("\"" + query + "\"");
         Response response = sendGetRequest(uri);
-        return getChamberOfCommerceCodesFromResponse(response);
+
+        return getSirenResultsFromResponse(response);
     }
 
-    public String getCompanyName(String chamberOfCommerceCode) {
+    public SirenResult getCompanyName(String chamberOfCommerceCode) {
         UriBuilder uriBuilder = UriBuilder
                 .fromUri("https://data.opendatasoft.com")
                 .path("api/records/1.0/search/")
@@ -55,7 +55,9 @@ public class Siren {
                 .queryParam("refine.siren", "{code}");
         URI uri = uriBuilder.build(chamberOfCommerceCode);
         Response response = sendGetRequest(uri);
-        return getCompanyNameFromResponse(response);
+
+        List<SirenResult> results = getSirenResultsFromResponse(response);
+        return results.size() > 0 ? results.get(0) : null;
     }
 
     private Response sendGetRequest(final URI uri) {
@@ -74,15 +76,25 @@ public class Siren {
         }
     }
 
-    private List<String> getChamberOfCommerceCodesFromResponse(Response response) {
+    private List<SirenResult> getSirenResultsFromResponse(Response response) {
         JsonArray records = getRecordsArray(response);
-        return getUniqueValuesForField(records, "siren");
-    }
 
-    private String getCompanyNameFromResponse(Response response) {
-        JsonArray records = getRecordsArray(response);
-        List<String> results = getUniqueValuesForField(records, "l1_normalisee");
-        return results.size() > 0 ? results.get(0) : null;
+        Set<SirenResult> resultsSet = new TreeSet<>();
+        Iterator<JsonElement> recordsIterator = records.iterator();
+        while(recordsIterator.hasNext()) {
+            try {
+                JsonElement element = recordsIterator.next();
+                JsonObject object = element.getAsJsonObject();
+                object = object.getAsJsonObject("fields");
+                String code = object.getAsJsonPrimitive("siren").getAsString();
+                String name = object.getAsJsonPrimitive("l1_normalisee").getAsString();
+                SirenResult result = new SirenResult(code, name);
+                resultsSet.add(result);
+            } catch(Exception e) {
+                // ignore
+            }
+        }
+        return Lists.newArrayList(resultsSet);
     }
 
     private JsonArray getRecordsArray(Response response) {
@@ -90,23 +102,5 @@ public class Siren {
         JsonElement jsonElement = new JsonParser().parse(responseJson);
         JsonObject jsonObject = jsonElement.getAsJsonObject();
         return jsonObject.getAsJsonArray("records");
-    }
-
-    private List<String> getUniqueValuesForField(JsonArray records, String field) {
-        Set<String> fieldSet = new TreeSet<>();
-        Iterator<JsonElement> recordsIterator = records.iterator();
-        while(recordsIterator.hasNext()) {
-            JsonElement element = recordsIterator.next();
-            try {
-                JsonObject object = element.getAsJsonObject();
-                object = object.getAsJsonObject("fields");
-                JsonPrimitive primitive = object.getAsJsonPrimitive(field);
-                String code = primitive.getAsString();
-                fieldSet.add(code);
-            } catch(Exception e) {
-                // ignore
-            }
-        }
-        return Lists.newArrayList(fieldSet);
     }
 }

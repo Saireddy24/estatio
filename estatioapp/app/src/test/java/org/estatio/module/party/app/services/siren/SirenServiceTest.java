@@ -22,7 +22,7 @@ import org.junit.Test;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SirenTest {
+public class SirenServiceTest {
     public static String COMPANY_QUERY = "APPLE FRANCE";
     public static String COMPANY_NAME = "APPLE";
     public static String COMPANY_CODE = "322120916";
@@ -30,46 +30,46 @@ public class SirenTest {
     @Test
     public void company_query_should_return_company_code() {
         // given
-        Siren siren = new Siren();
+        SirenService sirenService = new SirenService();
 
         // when
-        List<String> codes = siren.getChamberOfCommerceCodes(COMPANY_QUERY);
+        List<SirenResult> results = sirenService.getChamberOfCommerceCodes(COMPANY_QUERY);
 
         // then
-        assertThat(codes.size()).isEqualTo(1);
-        String code = codes.get(0);
-        assertThat(code).isEqualTo(COMPANY_CODE);
+        assertThat(results.size()).isEqualTo(1);
+        SirenResult result = results.get(0);
+        assertThat(result.getChamberOfCommerceCode()).isEqualTo(COMPANY_CODE);
     }
 
     @Test
     public void company_code_should_return_company_name() {
         // given
-        Siren siren = new Siren();
+        SirenService sirenService = new SirenService();
 
         // when
-        String companyName = siren.getCompanyName(COMPANY_CODE);
+        SirenResult result = sirenService.getCompanyName(COMPANY_CODE);
 
         // then
-        assertThat(companyName).isEqualTo(COMPANY_NAME);
+        assertThat(result.getCompanyName()).isEqualTo(COMPANY_NAME);
     }
 
     @Test
     public void full_circle() {
         // given
-        Siren siren = new Siren();
+        SirenService sirenService = new SirenService();
 
         // when
-        List<String> codes = siren.getChamberOfCommerceCodes(COMPANY_QUERY);
+        List<SirenResult> codeResults = sirenService.getChamberOfCommerceCodes(COMPANY_QUERY);
 
         // then
-        assertThat(codes.size()).isEqualTo(1);
-        String code = codes.get(0);
-        assertThat(code).isEqualTo(COMPANY_CODE);
+        assertThat(codeResults.size()).isEqualTo(1);
+        SirenResult codeResult = codeResults.get(0);
+        assertThat(codeResult.getChamberOfCommerceCode()).isEqualTo(COMPANY_CODE);
 
         // when
-        String companyName = siren.getCompanyName(code);
+        SirenResult companyNameResult = sirenService.getCompanyName(codeResult.getChamberOfCommerceCode());
 
         // then
-        assertThat(companyName).isEqualTo(COMPANY_NAME);
+        assertThat(companyNameResult.getCompanyName()).isEqualTo(COMPANY_NAME);
     }
 }

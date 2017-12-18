@@ -7,7 +7,8 @@ import java.util.List;
 import org.apache.isis.applib.annotation.DomainService;
 import org.apache.isis.applib.annotation.NatureOfService;
 
-import org.estatio.module.party.app.services.siren.Siren;
+import org.estatio.module.party.app.services.siren.SirenResult;
+import org.estatio.module.party.app.services.siren.SirenService;
 import org.estatio.module.party.dom.Organisation;
 
 @DomainService(
@@ -23,8 +24,8 @@ public class ChamberOfCommerceCodeLookUpService {
 
         switch (atPath){
         case "/FRA":
-//            return findCandidatesForFranceByName(name);
-            return findCandidatesForFranceFake(name); // TODO: remove after developement
+            return findCandidatesForFranceByName(name);
+//            return findCandidatesForFranceFake(name); // TODO: remove after developement
 
         default:
             return Collections.emptyList();
@@ -39,8 +40,8 @@ public class ChamberOfCommerceCodeLookUpService {
     public OrganisationNameNumberViewModel getChamberOfCommerceCodeCandidatesByCode(final String code, final String atPath) {
         switch (atPath){
         case "/FRA":
-//              return findCandidateForFranceByCode(code);
-            return findCandidatesForFranceFake(code).get(0); // TODO: remove after developement
+              return findCandidateForFranceByCode(code);
+//            return findCandidatesForFranceFake(code).get(0); // TODO: remove after developement
 
         default:
             return null;
@@ -57,22 +58,21 @@ public class ChamberOfCommerceCodeLookUpService {
     }
 
     List<OrganisationNameNumberViewModel> findCandidatesForFranceByName(final String name){
-        // TODO: improve SIREN to return name of company (l1_normalisee) alongside chamberOfCommerceCode to reduce number of api calls
         List<OrganisationNameNumberViewModel> result = new ArrayList<>();
-        Siren siren = new Siren();
-        List<String> resultsForCode = siren.getChamberOfCommerceCodes(name);
-        for (String code : resultsForCode){
-            String companyName = siren.getCompanyName(code);
-            result.add(new OrganisationNameNumberViewModel(companyName, code));
+        SirenService sirenService = new SirenService();
+        List<SirenResult> sirenResults = sirenService.getChamberOfCommerceCodes(name);
+        for (SirenResult sirenResult : sirenResults){
+            String companyName = sirenResult.getCompanyName();
+            String cocc = sirenResult.getChamberOfCommerceCode();
+            result.add(new OrganisationNameNumberViewModel(companyName, cocc));
         }
         return result;
     }
 
     OrganisationNameNumberViewModel findCandidateForFranceByCode(final String code){
-        List<OrganisationNameNumberViewModel> result = new ArrayList<>();
-        Siren siren = new Siren();
-        String resultForCode = siren.getCompanyName(code);
-        return new OrganisationNameNumberViewModel(resultForCode, code);
+        SirenService sirenService = new SirenService();
+        String companyName = sirenService.getCompanyName(code).getCompanyName();
+        return new OrganisationNameNumberViewModel(companyName, code);
     }
 
 }
