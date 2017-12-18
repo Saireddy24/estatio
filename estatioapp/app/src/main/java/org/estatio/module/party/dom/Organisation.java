@@ -23,7 +23,6 @@ import java.util.List;
 import java.util.SortedSet;
 import java.util.TreeSet;
 
-import javax.annotation.Nullable;
 import javax.inject.Inject;
 import javax.jdo.annotations.InheritanceStrategy;
 import javax.jdo.annotations.Persistent;
@@ -98,9 +97,8 @@ public class Organisation
 
     // //////////////////////////////////////
 
-    @Property(optionality = Optionality.OPTIONAL)
     @Getter @Setter
-    private Boolean verified;
+    private boolean verified;
 
     // //////////////////////////////////////
 
@@ -168,16 +166,16 @@ public class Organisation
 
     @Action(semantics = SemanticsOf.IDEMPOTENT_ARE_YOU_SURE)
     public Organisation verify(
-            @Nullable final OrganisationNameNumberViewModel organisationCheck
+            final OrganisationNameNumberViewModel organisationCheck
     ){
 
-        if (!Strings.isNullOrEmpty(organisationCheck.getChamberOfCommerceCode())) {
-            setChamberOfCommerceCodeIfNotAlready(organisationCheck.getChamberOfCommerceCode());
-        }
-        if (!Strings.isNullOrEmpty(organisationCheck.getOrganisationName()) && !organisationCheck.getOrganisationName().equals(getName())) {
-            changeName(organisationCheck.getOrganisationName(), clockService.now());
-        }
-        setVerified(true);
+            if (!Strings.isNullOrEmpty(organisationCheck.getChamberOfCommerceCode())) {
+                setChamberOfCommerceCodeIfNotAlready(organisationCheck.getChamberOfCommerceCode());
+            }
+            if (!Strings.isNullOrEmpty(organisationCheck.getOrganisationName()) && !organisationCheck.getOrganisationName().equals(getName())) {
+                changeName(organisationCheck.getOrganisationName(), clockService.now());
+            }
+            setVerified(true);
 
         return this;
     }
@@ -188,6 +186,10 @@ public class Organisation
         } else {
             return Arrays.asList(chamberOfCommerceCodeLookUpService.getChamberOfCommerceCodeCandidatesByCode(this));
         }
+    }
+
+    public boolean hideVerify(){
+        return isVerified();
     }
 
     @Programmatic

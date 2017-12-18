@@ -160,7 +160,7 @@ public class Organisation_Test {
         organisation.changeName(new_name, previousNameEndDate);
 
         // then
-        assertThat(organisation.getVerified()).isFalse();
+        assertThat(organisation.isVerified()).isFalse();
         assertThat(organisation.getName()).isEqualTo(new_name);
 
     }
@@ -181,7 +181,7 @@ public class Organisation_Test {
         organisation.changeName(new_name, previousNameEndDate);
 
         // then
-        assertThat(organisation.getVerified()).isTrue();
+        assertThat(organisation.isVerified()).isTrue();
 
     }
 
@@ -199,7 +199,7 @@ public class Organisation_Test {
         organisation.change(null, null, new_code);
 
         // then
-        assertThat(organisation.getVerified()).isFalse();
+        assertThat(organisation.isVerified()).isFalse();
         assertThat(organisation.getChamberOfCommerceCode()).isEqualTo(new_code);
 
     }
@@ -218,7 +218,7 @@ public class Organisation_Test {
         organisation.change(null, null, new_code);
 
         // then
-        assertThat(organisation.getVerified()).isTrue();
+        assertThat(organisation.isVerified()).isTrue();
 
     }
 
@@ -251,7 +251,7 @@ public class Organisation_Test {
         // then
         assertThat(organisation.getName()).isEqualTo(looked_up_name);
         assertThat(organisation.getChamberOfCommerceCode()).isEqualTo(chamberOfCommerceCode);
-        assertThat(organisation.getVerified()).isTrue();
+        assertThat(organisation.isVerified()).isTrue();
 
     }
 
@@ -285,7 +285,7 @@ public class Organisation_Test {
         // then
         assertThat(organisation.getName()).isEqualTo(looked_up_name);
         assertThat(organisation.getChamberOfCommerceCode()).isEqualTo(oldChamberOfCommerceCode);
-        assertThat(organisation.getVerified()).isTrue();
+        assertThat(organisation.isVerified()).isTrue();
 
     }
 
