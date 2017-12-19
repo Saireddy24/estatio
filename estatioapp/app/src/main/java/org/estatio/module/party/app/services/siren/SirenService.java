@@ -16,6 +16,7 @@
  */
 package org.estatio.module.party.app.services.siren;
 
+import java.net.ConnectException;
 import java.net.URI;
 import java.util.Iterator;
 import java.util.List;
@@ -35,7 +36,7 @@ import com.google.gson.JsonObject;
 import com.google.gson.JsonParser;
 
 public class SirenService {
-    public List<SirenResult> getChamberOfCommerceCodes(String query) {
+    public List<SirenResult> getChamberOfCommerceCodes(String query) throws ConnectException {
         UriBuilder uriBuilder = UriBuilder
                 .fromUri("https://data.opendatasoft.com")
                 .path("api/records/1.0/search/")
@@ -47,7 +48,7 @@ public class SirenService {
         return getSirenResultsFromResponse(response);
     }
 
-    public SirenResult getCompanyName(String chamberOfCommerceCode) {
+    public SirenResult getCompanyName(String chamberOfCommerceCode) throws ConnectException{
         UriBuilder uriBuilder = UriBuilder
                 .fromUri("https://data.opendatasoft.com")
                 .path("api/records/1.0/search/")
